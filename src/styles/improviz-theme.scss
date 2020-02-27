@@ -1,0 +1,108 @@
+@use 'solarized';
+
+$cursor-color: #fff;
+/*
+  Name:       Improviz Theme
+*/
+
+/* general text stylings */
+
+/* Specifically only make the first child span background translucent
+ * otherwise there are wierd bugs with highlighted code backgrounds
+ * */
+.cm-s-improviz {
+
+  &.CodeMirror {
+    background: transparent;
+  }
+
+  &.CodeMirror .CodeMirror-line > span {
+    background-color: solarized.$base03;
+    opacity: 80%;
+  }
+
+  .CodeMirror-line span span.CodeMirror-selectedtext {
+    background-color: solarized.$base1;
+  }
+
+  .CodeMirror-gutters {
+    background: transparent;
+    border-right: 0;
+  }
+
+  /* Cursor styling */
+
+  /* make cursor appear above text */
+  &.cm-fat-cursor .CodeMirror-cursors {
+    z-index: 15;
+  }
+
+  /* Vim command mode */
+  &.cm-fat-cursor .CodeMirror-cursor {
+    background-color: rgba($cursor-color, 0.66);
+    opacity: 80%;
+  }
+  /* Vim visual mode and selected text mode */
+  .CodeMirror-line .cm-animate-fat-cursor {
+    background-color: $cursor-color;
+  }
+  /* Vim insert mode and normal cursor */
+  .CodeMirror-cursor {
+    border-left: 3px solid $cursor-color;
+  }
+
+  /* language highlighting */
+
+  /* unstyled text */
+  &.CodeMirror {
+    color: solarized.$base2;
+  }
+
+  span.cm-comment {
+    color: solarized.$base01;
+  }
+  span.cm-operator,
+  span.cm-atom {
+    color: solarized.$orange;
+  }
+  span.cm-number {
+    color: solarized.$cyan;
+  }
+
+  span.cm-property,
+  span.cm-attribute {
+    color: solarized.$green;
+  }
+  span.cm-tag {
+    color: solarized.$violet;
+  }
+  span.cm-keyword {
+    color: solarized.$green;
+  }
+  span.cm-string {
+    color: solarized.$cyan;
+  }
+
+  span.cm-variable {
+    color: solarized.$cyan;
+  }
+  span.cm-variable-2 {
+    color: solarized.$blue;
+  }
+  span.cm-def {
+    color: solarized.$orange;
+  }
+  span.cm-bracket {
+    color: solarized.$green;
+  }
+  span.cm-link {
+    color: solarized.$violet;
+  }
+
+  span.cm-error {
+    background-color: solarized.$base01;
+    font-weight: bold;
+    color: solarized.$red;
+  }
+
+}

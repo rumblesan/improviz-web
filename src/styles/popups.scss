@@ -1,0 +1,55 @@
+@use 'solarized';
+
+.popup-window {
+  padding: 10px;
+  background-color: solarized.$base02;
+  font-size: 16px;
+  font-family: Tahoma, Geneva, sans-serif;
+  color: solarized.$base1;
+  border-radius: 5px;
+  scrollbar-width: thin;
+  scrollbar-color: solarized.$cyan solarized.$base02;
+
+  &::-webkit-scrollbar {
+    width: 11px;
+  }
+  &::-webkit-scrollbar-track {
+    background: solarized.$base02;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: solarized.$cyan;
+    border-radius: 6px;
+    border: 3px solid solarized.$base02;
+  }
+
+  h3, h4 {
+    color: solarized.$cyan;
+    font-weight: bold;
+    &.error {
+      color: solarized.$orange;
+    }
+  }
+
+  button.close {
+    color: solarized.$orange;
+    background-color: solarized.$base02;
+    border: 1px solid solarized.$orange;
+    border-radius: 3px;
+  }
+
+  hr {
+    padding: 0px;
+    margin: 5px 0px;
+    border: 1px solid solarized.$cyan;
+  }
+
+  section {
+    margin-bottom: 2rem;
+  }
+
+  pre {
+    background-color: solarized.$base03;
+    color: solarized.$base2;
+    white-space: pre-wrap;
+  }
+}

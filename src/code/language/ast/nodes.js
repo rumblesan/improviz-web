@@ -1,0 +1,21 @@
+export const PROGRAM = 'PROGRAM';
+export const BLOCK = 'BLOCK';
+export const LOOP = 'LOOP';
+export const ASSIGNMENT = 'ASSIGNMENT';
+export const CONDASSIGNMENT = 'CONDASSIGNMENT';
+export const IF = 'IF';
+export const LAMBDA = 'LAMBDA';
+export const BUILTIN = 'BUILTIN';
+export const FUNC = 'FUNC';
+export const APPLICATION = 'APPLICATION';
+export const BINARYOP = 'BINARYOP';
+export const UNARYOP = 'UNARYOP';
+export const VARIABLE = 'VARIABLE';
+export const INDEX = 'INDEX';
+export const NUM = 'NUM';
+export const NULL = 'NULL';
+export const SYMBOL = 'SYMBOL';
+export const LIST = 'LIST';
+
+export const VARARG = 'VARARG';
+export const BLOCKARG = 'BLOCKARG';

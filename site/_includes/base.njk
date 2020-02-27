@@ -1,0 +1,28 @@
+---
+title: Improviz Web
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+     <link rel="stylesheet" href="/site/css/style.css" />
+     <title>{{ title }}</title>
+  </head>
+  <body>
+    <header>
+      <nav class="navbar-left">
+        <ul>
+          <li>
+            <a href="https://improviz-web.rumblesan.com" class="title">Improviz-Web</a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <section class="content">
+      {{ content | safe }}
+    </section>
+  </body>
+</html>

@@ -1,0 +1,91 @@
+@use 'solarized';
+@use 'nav';
+@use 'improviz-theme';
+@use 'popups';
+@use 'noscript';
+
+.debug {
+  background-color: red !important;
+}
+.hidden {
+  display: none;
+}
+
+/* Layout */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  height: 100%;
+  margin: 0 auto;
+  width: 100%;
+}
+
+header {
+  position: absolute;
+  width: 100%;
+  z-index: 6;
+  display: flex;
+  justify-content: space-between;
+}
+
+.CodeMirror {
+  position: absolute;
+  top: 2rem;
+  left: 0px;
+  z-index: 5;
+  width: 100%;
+  height: calc(100% - 2rem);
+}
+
+canvas {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+}
+
+/* Styling */
+
+body {
+  background-color: solarized.$base03;
+  font-size: 16px;
+  font-family: Tahoma, Geneva, sans-serif;
+}
+
+header {
+  color: solarized.$base0;
+  background-color: solarized.$base02;
+}
+
+a {
+  color: solarized.$violet;
+}
+
+button {
+  color: solarized.$green;
+  border: 1px solid solarized.$green;
+  background-color: solarized.$base02;
+  border-radius: 3px;
+}
+
+button:hover {
+  color: solarized.$base02;
+  background-color: solarized.$blue;
+}
+
+
+.CodeMirror {
+  font-size: 1.125rem;
+}
+
+/** Performance mode
+ *  Hide the header so we get more canvas.
+ */
+
+.performance-mode header {
+  visibility: hidden;
+}

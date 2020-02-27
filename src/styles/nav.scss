@@ -1,0 +1,53 @@
+@use 'solarized';
+
+nav {
+
+  /* Layout */
+
+  &.navbar-left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 2rem;
+  }
+  &.navbar-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 2rem;
+  }
+
+  ul {
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+  }
+
+  ul li {
+    list-style: none;
+  }
+
+  ul li a,
+  ul li span,
+  ul li button {
+    margin: 0px 5px;
+    padding: 2px 5px;
+    text-align: center;
+    font-size: 1em;
+  }
+
+
+  /* Styling */
+
+  .title {
+    color: solarized.$cyan;
+    font-weight: bold;
+  }
+
+  .error-display {
+    color: solarized.$red;
+    background-color: solarized.$base02;
+    text-decoration: underline;
+  }
+}
