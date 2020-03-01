@@ -43,12 +43,32 @@ class Parser extends VirgilParser {
     return Math.round((token.character - 1) / indentPerBlock);
   }
 
-  blockLevelMatch(blockLevel, token) {
-    const indentLevel = this.calculateBlockLevel(token);
-    if (blockLevel !== indentLevel) {
-      return new IncorrectIndentationException(blockLevel, indentLevel, token);
+  tokenPosition(token) {
+    if (this.testing) return {};
+
+    return { line: token.line, character: token.character };
+  }
+
+  blockDepthCheck(currentBlockDepth, token) {
+    const nextBlockDepth = this.calculateBlockLevel(token);
+    if (currentBlockDepth !== nextBlockDepth) {
+      this.errors.push(
+        new IncorrectIndentationException(
+          currentBlockDepth,
+          nextBlockDepth,
+          token
+        )
+      );
     }
-    return null;
+    return nextBlockDepth;
+  }
+
+  skipUntil(stopTokens) {
+    while (!this.eof()) {
+      const t = this.peek();
+      if (stopTokens.includes(t.type)) break;
+      this.next();
+    }
   }
 
   parse(program, options = {}) {
@@ -79,153 +99,166 @@ class Parser extends VirgilParser {
     return ast.Program(statements);
   }
 
-  statement(blockLevel) {
+  statement(blockDepth) {
     this.debugLog('Statement');
 
     if (this.la1('if')) {
-      return this.if(blockLevel);
+      return this.if(blockDepth);
     }
 
     if (this.la1('func')) {
-      return this.funcDef(blockLevel);
+      return this.funcDef(blockDepth);
     }
 
     if (this.la1('loop')) {
-      return this.loop(blockLevel);
+      return this.loop(blockDepth);
     }
 
     if (this.la1('identifier')) {
       const idToken = this.match('identifier');
 
-      let idErr = this.blockLevelMatch(blockLevel, idToken);
-      if (idErr) {
-        this.errors.push(idErr);
-      }
+      this.blockDepthCheck(blockDepth, idToken);
 
       if (this.la1('assignment') || this.la1('colon')) {
         return this.assignment(idToken);
       }
 
       if (this.la1('open paren')) {
-        return this.application(blockLevel, idToken);
+        return this.application(blockDepth, idToken);
       }
     }
     const t = this.peek();
-    throw new ParserException(`Unexpected ${t.type}`);
+    this.errors.push(new ParserException(`Unexpected ${t.type}`));
+    this.skipUntil(['newline']);
   }
 
-  block(blockLevel) {
+  block(blockDepth) {
     this.debugLog('Block');
 
-    let i = 0;
+    let currentBlockDepth = blockDepth;
     const elements = [];
     // FIXME need to know when block ends
     while (!this.eof()) {
       const nextToken = this.peek();
-      const nextIndent = this.calculateBlockLevel(nextToken);
-      if (nextIndent < blockLevel) break;
-      i++;
-      if (i > 20) {
-        throw new ParserException('stack down');
-      }
-      elements.push(this.element(blockLevel));
+      const nextBlockDepth = this.calculateBlockLevel(nextToken);
+      if (nextBlockDepth < currentBlockDepth) break;
+      elements.push(this.element(blockDepth));
     }
     return ast.Block(elements);
   }
 
-  element(blockLevel) {
+  element(blockDepth) {
     this.debugLog('Element');
 
     if (this.la1('if')) {
-      return this.if(blockLevel);
+      return this.if(blockDepth);
     }
 
     if (this.la1('func')) {
-      return this.funcDef(blockLevel);
+      return this.funcDef(blockDepth);
     }
 
     if (this.la1('loop')) {
-      return this.loop(blockLevel);
+      return this.loop(blockDepth);
     }
 
     if (this.la1('identifier')) {
       const idToken = this.match('identifier');
-      let idErr = this.blockLevelMatch(blockLevel, idToken);
-      if (idErr) {
-        this.errors.push(idErr);
-      }
+      this.blockDepthCheck(blockDepth, idToken);
 
       if (this.la1('assignment') || this.la1('colon')) {
         return this.assignment(idToken);
       }
 
       if (this.la1('open paren')) {
-        return this.application(blockLevel, idToken);
+        return this.application(blockDepth, idToken);
       }
     }
     const t = this.peek();
-    throw new ParserException(`Unexpected ${t.type}`);
+    this.errors.push(new ParserException(`Unexpected ${t.type}`));
+    this.skipUntil(['newline']);
   }
 
-  if(blockLevel) {
+  if(blockDepth) {
     this.debugLog('If');
+
+    const position = this.position();
     const conditionals = [];
+
     const ifToken = this.match('if');
-    let ifErr = this.blockLevelMatch(blockLevel, ifToken);
-    if (ifErr) {
-      throw ifErr;
+    this.blockDepthCheck(blockDepth, ifToken);
+
+    let predicate;
+    try {
+      predicate = this.expression();
+    } catch (e) {
+      this.errors.push(e);
+      this.resetStream('newline');
+      predicate = ast.Null();
     }
-    const predicate = this.expression();
     this.clearNewlines();
-    const ifBlock = this.block(blockLevel + 1);
+
+    const ifBlock = this.block(blockDepth + 1);
     conditionals.push([predicate, ifBlock]);
 
     if (this.eof() || !this.la1('else')) {
-      return ast.If(conditionals);
+      return ast.If(conditionals, position);
     }
 
     while (!this.eof() && this.la1('else')) {
       const elseToken = this.match('else');
-      let elseErr = this.blockLevelMatch(blockLevel, elseToken);
-      if (elseErr) {
-        throw elseErr;
-      }
+      this.blockDepthCheck(blockDepth, elseToken);
       let predicate;
       if (this.la1('if')) {
         this.match('if');
-        predicate = this.expression();
+        try {
+          predicate = this.expression();
+        } catch (e) {
+          this.errors.push(e);
+          this.resetStream('newline');
+          predicate = ast.Null();
+        }
       } else {
         predicate = ast.Num(1);
       }
       this.clearNewlines();
-      const block = this.block(blockLevel + 1);
+      const block = this.block(blockDepth + 1);
       conditionals.push([predicate, block]);
     }
 
-    return ast.If(conditionals);
+    return ast.If(conditionals, position);
   }
 
-  funcDef(blockLevel) {
+  funcDef(blockDepth) {
     this.debugLog('Function Definition');
 
+    const position = this.position();
     const funcToken = this.match('func');
-    let funcErr = this.blockLevelMatch(blockLevel, funcToken);
-    if (funcErr) {
-      throw funcErr;
+    this.blockDepthCheck(blockDepth, funcToken);
+
+    let name;
+    let args;
+    let expr;
+
+    try {
+      name = this.match('identifier').content;
+      this.match('open paren');
+      args = this.argList('close paren', 'comma');
+      this.match('close paren');
+      if (this.la1('lambda arrow')) {
+        this.match('lambda arrow');
+        expr = this.expression();
+        this.clearNewlines();
+        return ast.Func(name, args, ast.Block([expr]), position);
+      }
+    } catch (e) {
+      this.errors.push(e);
+      this.resetStream('newline');
     }
-    const name = this.match('identifier');
-    this.match('open paren');
-    const args = this.argList('close paren', 'comma');
-    this.match('close paren');
-    if (this.la1('lambda arrow')) {
-      this.match('lambda arrow');
-      const expr = this.expression();
-      this.clearNewlines();
-      return ast.Func(name.content, args, ast.Block([expr]));
-    }
+
     this.clearNewlines();
-    const body = this.block(blockLevel + 1);
-    return ast.Func(name.content, args, body);
+    const body = this.block(blockDepth + 1);
+    return ast.Func(name, args, body, position);
   }
 
   argList(endToken, delimiter) {
@@ -246,6 +279,7 @@ class Parser extends VirgilParser {
   functionArg() {
     this.debugLog('Function Argument');
 
+    // FIXME better error handling could happen here
     if (this.la1('&')) {
       this.match('&');
       const id = this.match('identifier');
@@ -255,88 +289,128 @@ class Parser extends VirgilParser {
     return ast.VarArg(id.content);
   }
 
-  loop(blockLevel) {
+  loop(blockDepth) {
     this.debugLog('Loop');
 
+    const position = this.position();
+
     const loopToken = this.match('loop');
-    let loopErr = this.blockLevelMatch(blockLevel, loopToken);
-    if (loopErr) {
-      throw loopErr;
-    }
-    const countExpr = this.expression();
-    this.match('times');
-    let loopVar = ast.Null();
-    if (this.la1('with')) {
-      this.match('with');
-      loopVar = this.variable();
+    this.blockDepthCheck(blockDepth, loopToken);
+
+    let countExpr;
+    let loopVar;
+    try {
+      countExpr = this.expression();
+      this.match('times');
+      loopVar = ast.Null();
+      if (this.la1('with')) {
+        this.match('with');
+        loopVar = this.variable();
+      }
+    } catch (e) {
+      this.errors.push(e);
+      this.resetStream('newline');
     }
     this.clearNewlines();
-    const loopBlock = this.block(blockLevel + 1);
-    return ast.Loop(countExpr, loopBlock, loopVar);
+    const loopBlock = this.block(blockDepth + 1);
+    return ast.Loop(countExpr, loopBlock, loopVar, position);
   }
 
   assignment(idToken) {
     this.debugLog('Assignment');
 
+    const position = this.tokenPosition(idToken);
+
+    let expr;
+
     if (this.la1('colon')) {
-      this.match('colon');
-      this.match('assignment');
-      const expr = this.expression();
-      return ast.ConditionalAssignment(idToken.content, expr);
+      try {
+        this.match('colon');
+        this.match('assignment');
+        expr = this.expression();
+      } catch (e) {
+        this.errors.push(e);
+        this.resetStream('newline');
+      }
+      return ast.ConditionalAssignment(idToken.content, expr, position);
     }
-    this.match('assignment');
-    const expr = this.expression();
+
+    try {
+      this.match('assignment');
+      expr = this.expression();
+    } catch (e) {
+      this.errors.push(e);
+      this.resetStream('newline');
+    }
     this.clearNewlines();
-    return ast.Assignment(idToken.content, expr);
+    return ast.Assignment(idToken.content, expr, position);
   }
 
-  application(blockLevel, idToken) {
+  application(blockDepth, idToken) {
     this.debugLog('Application');
 
-    this.match('open paren');
-    const args = this.exprList();
-    this.match('close paren');
+    this.blockDepthCheck(blockDepth, idToken);
+    const position = this.tokenPosition(idToken);
 
-    // FIXME this is ugly!!
+    let args;
+    try {
+      this.match('open paren');
+      args = this.exprList();
+      this.match('close paren');
+    } catch (e) {
+      this.errors.push(e);
+      this.resetStream('newline');
+    }
+
     if (this.eof() || !this.la1('newline')) {
-      return ast.Application(idToken.content, args);
+      return ast.Application(idToken.content, args, ast.Null(), position);
     }
     this.clearNewlines();
     if (this.eof()) {
-      return ast.Application(idToken.content, args);
+      return ast.Application(idToken.content, args, ast.Null(), position);
     }
 
     const nextIndent = this.calculateBlockLevel(this.peek());
-    if (nextIndent <= blockLevel) {
-      return ast.Application(idToken.content, args);
+    if (nextIndent <= blockDepth) {
+      return ast.Application(idToken.content, args, ast.Null(), position);
     } else {
-      const lambda = this.applicationLambda(blockLevel + 1);
-      return ast.Application(idToken.content, args, lambda);
+      const lambda = this.applicationLambda(blockDepth + 1);
+      return ast.Application(idToken.content, args, lambda, position);
     }
   }
 
-  applicationLambda(blockLevel) {
+  applicationLambda(blockDepth) {
+    let position = this.position();
     let args = [];
     if (this.la1('pipe')) {
       const pipeToken = this.match('pipe');
-      let blockErr = this.blockLevelMatch(blockLevel, pipeToken);
-      if (blockErr) {
-        throw blockErr;
+      this.blockDepthCheck(blockDepth, pipeToken);
+      try {
+        args = this.argList('pipe', 'comma');
+        this.match('pipe');
+        this.match('newline');
+      } catch (e) {
+        this.errors.push(e);
+        this.resetStream('newline');
       }
-      args = this.argList('pipe', 'comma');
-      this.match('pipe');
-      this.match('newline');
     }
-    const block = this.block(blockLevel);
-    return ast.Lambda(args, ast.Null(), block);
+    const block = this.block(blockDepth);
+    return ast.Lambda(args, ast.Null(), block, position);
   }
 
   expressionApplication(idToken) {
-    this.match('open paren');
-    const args = this.exprList();
-    this.match('close paren');
+    let args;
+    let position = this.position();
+    try {
+      this.match('open paren');
+      args = this.exprList();
+      this.match('close paren');
+    } catch (e) {
+      this.errors.push(e);
+      this.resetStream('newline');
+    }
 
-    return ast.Application(idToken.content, args);
+    return ast.Application(idToken.content, args, ast.Null(), position);
   }
 
   exprList() {
@@ -348,7 +422,14 @@ class Parser extends VirgilParser {
     args.push(this.expression());
     while (this.la1('comma')) {
       this.match('comma');
-      args.push(this.expression());
+      let expr;
+      try {
+        expr = this.expression();
+      } catch (e) {
+        this.errors.push(e);
+        this.resetStream('comma');
+      }
+      args.push(expr);
     }
     this.debugLog(`exprList: ${args.length} args`);
     return args;
@@ -424,16 +505,16 @@ class Parser extends VirgilParser {
 
   number() {
     this.debugLog('Number');
-
+    const position = this.position();
     const num = this.match('number');
-    return ast.Num(num.content);
+    return ast.Num(num.content, position);
   }
 
   variable() {
     this.debugLog('Variable');
-
+    const position = this.position();
     const id = this.match('identifier');
-    return ast.Variable(id.content);
+    return ast.Variable(id.content, position);
   }
 }
 
