@@ -13,6 +13,7 @@ import { getConfig } from './code/config';
 import { EventBus } from './code/event-bus';
 import { Popups } from './code/ui/popups';
 import { UI } from './code/ui';
+import { IGfx } from './code/gfx';
 
 const canvas = document.getElementById('canvas');
 
@@ -37,6 +38,8 @@ if (!gl) {
     'Could not create WebGL context'
   );
 } else {
+  const gfx = new IGfx(canvas, gl);
+
   popups.register('settings', true, () => {
     const defaultKeymapURL = URL.fromLocation();
     defaultKeymapURL.searchParams.delete('keymap');
@@ -64,9 +67,6 @@ if (!gl) {
   });
 
   clickHandler('#evaluate', () => eventBus.emit('evaluate'));
-  clickHandler('#display-glsl', () =>
-    eventBus.emit('display-popup', 'glslcode')
-  );
   clickHandler('#display-sharing', () =>
     eventBus.emit('display-popup', 'sharing')
   );
@@ -82,4 +82,7 @@ if (!gl) {
   if (hash) {
     eventBus.emit('display-popup', hash);
   }
+
+  gfx.setup();
+  gfx.start();
 }
