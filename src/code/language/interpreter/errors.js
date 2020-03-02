@@ -1,9 +1,8 @@
 export class InterpreterError extends Error {
-  constructor(message, token) {
+  constructor(message, node) {
     super(message);
     this.name = 'InterpreterError';
-    this.line = token.line;
-    this.character = token.character;
-    this.length = token.content.length;
+    this.line = node.line;
+    this.character = node.character;
   }
 }

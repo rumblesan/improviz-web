@@ -1,6 +1,6 @@
 import { makeFunc, makeNum } from '../ffi';
 
-import { fill } from './style';
+import { style } from './style';
 import { shape } from './shapes';
 import { rotate, move } from './transforms';
 
@@ -15,7 +15,7 @@ export class StdLib {
       shape: makeFunc('shape', shape.bind(this.runtime)),
       rotate: makeFunc('rotate', rotate.bind(this.runtime)),
       move: makeFunc('move', move.bind(this.runtime)),
-      fill: makeFunc('move', fill.bind(this.runtime)),
+      style: makeFunc('style', style.bind(this.runtime)),
     };
   }
 
