@@ -4,9 +4,6 @@ import {
   vec3,
   identityM44,
   multiplyM44,
-  rotationXM44,
-  rotationYM44,
-  rotationZM44,
 } from './matrices';
 import { makeShape, compileProgram, fragCode, vertCode } from './shaders';
 import { cube } from './geometries';
@@ -17,9 +14,7 @@ export class IGfx {
     this.canvas.width = canvasEl.clientWidth;
     this.canvas.height = canvasEl.clientHeight;
     this.ctx = context;
-  }
 
-  setup() {
     this.pMatrix = projectionMatrix(
       1,
       100,
@@ -30,11 +25,8 @@ export class IGfx {
 
     this.matrixStack = [identityM44()];
 
-    this.cube = makeShape(
-      this.ctx,
-      compileProgram(this.ctx, vertCode, fragCode),
-      cube
-    );
+    this.geometries = {};
+    this.loadShape('cube', cube, vertCode, fragCode);
   }
 
   getMatrix() {
@@ -55,8 +47,17 @@ export class IGfx {
     this.matrixStack = [identityM44()];
   }
 
-  drawShape(shape, color) {
+  loadShape(name, geometry, vertShader, fragShader) {
+    this.geometries[name] = makeShape(
+      this.ctx,
+      compileProgram(this.ctx, vertShader, fragShader),
+      geometry
+    );
+  }
+
+  drawShape(name, color) {
     const gl = this.ctx;
+    const shape = this.geometries[name];
     gl.uniformMatrix4fv(shape.uniforms.Pmatrix, false, this.pMatrix);
     gl.uniformMatrix4fv(shape.uniforms.Vmatrix, false, this.vMatrix);
     gl.uniformMatrix4fv(shape.uniforms.Mmatrix, false, this.getMatrix());
@@ -70,26 +71,17 @@ export class IGfx {
     );
   }
 
-  start() {
+  reset() {
     const gl = this.ctx;
-    const animate = time => {
-      this.resetMatrix();
-      this.pushMatrix(rotationXM44(time * 0.05 * (Math.PI / 180)));
-      this.pushMatrix(rotationYM44(time * 0.05 * (Math.PI / 180)));
-      this.pushMatrix(rotationZM44(time * 0.05 * (Math.PI / 180)));
 
-      gl.enable(gl.DEPTH_TEST);
-      gl.depthFunc(gl.LEQUAL);
-      gl.clearColor(1, 1, 1, 0.9);
-      gl.clearDepth(1.0);
+    this.resetMatrix();
 
-      gl.viewport(0.0, 0.0, this.canvas.width, this.canvas.height);
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LEQUAL);
+    gl.clearColor(1, 1, 1, 0.9);
+    gl.clearDepth(1.0);
 
-      this.drawShape(this.cube, [1, 0, 0]);
-
-      window.requestAnimationFrame(animate);
-    };
-    animate(0);
+    gl.viewport(0.0, 0.0, this.canvas.width, this.canvas.height);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 }

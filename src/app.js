@@ -1,3 +1,5 @@
+/* global CodeMirror */
+
 import './index.html';
 import './favicon.ico';
 import './styles/main.scss';
@@ -13,6 +15,7 @@ import { getConfig } from './code/config';
 import { EventBus } from './code/event-bus';
 import { Popups } from './code/ui/popups';
 import { UI } from './code/ui';
+import { Improviz } from './code/improviz';
 import { IGfx } from './code/gfx';
 
 const canvas = document.getElementById('canvas');
@@ -39,6 +42,8 @@ if (!gl) {
   );
 } else {
   const gfx = new IGfx(canvas, gl);
+
+  const improviz = new Improviz(config, eventBus, CodeMirror, gfx);
 
   popups.register('settings', true, () => {
     const defaultKeymapURL = URL.fromLocation();
@@ -83,6 +88,5 @@ if (!gl) {
     eventBus.emit('display-popup', hash);
   }
 
-  gfx.setup();
-  gfx.start();
+  improviz.start();
 }

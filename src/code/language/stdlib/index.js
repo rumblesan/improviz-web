@@ -1,24 +1,27 @@
-import { makeFunc, isNum, isSymbol } from '../ffi';
+import { makeFunc, makeNum, isNum, isSymbol } from '../ffi';
 import { InterpreterError } from '../interpreter/errors';
 import { rotationXYZM44, moveXYZM44 } from '../../gfx/matrices';
 
 export class StdLib {
   constructor(runtime) {
     this.runtime = runtime;
-    console.log('gfx?', runtime);
+    this.scope = this.createScope();
   }
 
   createScope() {
     return {
-      shape: makeFunc(this.shape.bind(this)),
-      rotate: makeFunc(this.rotate.bind(this)),
-      move: makeFunc(this.move.bind(this)),
+      shape: makeFunc('shape', this.shape.bind(this)),
+      rotate: makeFunc('rotate', this.rotate.bind(this)),
+      move: makeFunc('move', this.move.bind(this)),
     };
+  }
+
+  setTime(value) {
+    this.scope.time = makeNum(value);
   }
 
   shape(args) {
     let [name, x, y, z] = args;
-    console.log('drawing shape', name);
     if (!isSymbol(name)) throw new InterpreterError('Expected Symbol', name);
     if (!isNum(x)) throw new InterpreterError('Expected Number', x);
     if (!isNum(y)) throw new InterpreterError('Expected Number', y);
