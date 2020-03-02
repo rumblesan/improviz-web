@@ -200,3 +200,14 @@ export function moveXYZM44(xMove, yMove, zMove) {
     xMove, yMove, zMove, 1,
   ];
 }
+
+//scaleMat xS yS zS = V4 (V4 xS 0 0 0) (V4 0 yS 0 0) (V4 0 0 zS 0) (V4 0 0 0 1)
+export function scaleXYZM44(xScale, yScale, zScale) {
+  // prettier-ignore
+  return [
+    xScale, 0, 0, 0,
+    0, yScale, 0, 0,
+    0, 0, zScale, 0,
+    0, 0, 0, 1,
+  ];
+}
