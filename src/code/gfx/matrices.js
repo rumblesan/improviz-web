@@ -194,9 +194,9 @@ export function rotationXYZM44(xAngle, yAngle, zAngle) {
 export function moveXYZM44(xMove, yMove, zMove) {
   // prettier-ignore
   return [
-    1, 0, 0, xMove,
-    0, 1, 0, yMove,
-    0, 0, 1, zMove,
-    0, 0, 0, 1,
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    xMove, yMove, zMove, 1,
   ];
 }
