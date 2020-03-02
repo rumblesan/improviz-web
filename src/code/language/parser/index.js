@@ -31,7 +31,7 @@ const BinaryOpConstructor = (opToken, value1Ast, value2Ast) => {
   return ast.BinaryOp(opToken.content, value1Ast, value2Ast, undefined, {});
 };
 
-class Parser extends VirgilParser {
+export class Parser extends VirgilParser {
   clearNewlines() {
     while (!this.eof() && this.la1('newline')) {
       this.match('newline');
@@ -517,5 +517,3 @@ class Parser extends VirgilParser {
     return ast.Variable(id.content, position);
   }
 }
-
-export default Parser;

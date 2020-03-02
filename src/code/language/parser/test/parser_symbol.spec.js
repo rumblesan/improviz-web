@@ -1,6 +1,6 @@
 /* global describe, it, parserTest */
 
-import Parser from '../index';
+import { Parser } from '../index';
 import { Assignment, Program, Symbol } from '../../ast';
 
 describe('Parser - symbols', function() {

@@ -2,7 +2,7 @@
 
 import { dedent } from 'dentist';
 
-import Parser from '../index';
+import { Parser } from '../index';
 import { Application, Lambda, Program, Block, Num, Null } from '../../ast';
 
 describe('Comments', function() {

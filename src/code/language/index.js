@@ -1,1 +1,3 @@
-export parser from './parser';
+export { Parser } from './parser';
+export { Interpreter } from './interpreter';
+export { StdLib } from './stdlib';

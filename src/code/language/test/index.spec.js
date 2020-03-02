@@ -2,7 +2,7 @@
 
 import { dedent } from 'dentist';
 
-import Parser from '../parser';
+import { Parser } from '../parser';
 import {
   Program,
   Block,

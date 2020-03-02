@@ -3,8 +3,8 @@
 import assert from 'assert';
 import { dedent } from 'dentist';
 
-import Interpreter from '../index';
-import Parser from '../../parser';
+import { Interpreter } from '../index';
+import { Parser } from '../../parser';
 import {
   Program,
   Application,
