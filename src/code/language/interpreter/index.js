@@ -27,7 +27,7 @@ function createChildScope(parentScope) {
   return Object.create(parentScope);
 }
 
-export class Interpreter {
+class Interpreter {
   constructor(stdlib) {
     this.stdlib = stdlib;
   }
@@ -350,3 +350,5 @@ export class Interpreter {
     return collection[index.value];
   }
 }
+
+export default Interpreter;

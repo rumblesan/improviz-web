@@ -3,7 +3,7 @@
 import assert from 'assert';
 import { dedent } from 'dentist';
 
-import { Interpreter } from '../index';
+import Interpreter from '../index';
 import Parser from '../../parser';
 import {
   Program,
@@ -34,7 +34,7 @@ describe('Interpreter', function() {
         },
       },
     };
-    const { ast } = parser.parse('result(3 + 4 * 2)');
+    const { ast } = parser.parse('result(3 + 4 * 2)', { testing: true });
     interpreter.run(ast, scope);
 
     assert.equal(output, 11, 'should return 11');
@@ -56,7 +56,8 @@ describe('Interpreter', function() {
     const { ast } = parser.parse(
       dedent(`
              a = foo + 1
-             result((a + 4) * foo)`)
+             result((a + 4) * foo)`),
+      { testing: true }
     );
     interpreter.run(ast, scope);
 
@@ -82,7 +83,8 @@ describe('Interpreter', function() {
              loop 5 times with i
                a = a + i
                result(a)
-             `)
+             `),
+      { testing: true }
     );
 
     interpreter.run(ast, scope);
@@ -110,7 +112,8 @@ describe('Interpreter', function() {
              //another function
              func b(x, y) => x + y
              result(b(a(2), 3) +  a(1))
-             `)
+             `),
+      { testing: true }
     );
 
     const expected = Program([
@@ -156,7 +159,8 @@ describe('Interpreter', function() {
 
              test(1)
                result(3)
-             `)
+             `),
+      { testing: true }
     );
 
     const expected = Program([
