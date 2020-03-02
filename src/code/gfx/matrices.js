@@ -2,11 +2,12 @@ const sin = Math.sin;
 const cos = Math.cos;
 const tan = Math.tan;
 const sqrt = Math.sqrt;
+const TORAD = Math.PI / 180;
 
 export const vec3 = (x, y, z) => [x, y, z];
 
 export function projectionMatrix(near, far, fov, aspect) {
-  const ang = tan(fov * 0.5 * (Math.PI / 180));
+  const ang = tan(fov * 0.5 * TORAD);
   const top = near * ang;
   const bottom = -top;
   const right = top * aspect;
@@ -149,11 +150,12 @@ export function rotationXM44(angle) {
 }
 
 export function rotationYM44(angle) {
+  const rads = angle * TORAD;
   // prettier-ignore
   return [
-    cos(angle),  0, sin(angle), 0,
+    cos(rads),  0, sin(rads), 0,
     0,           1, 0,          0,
-    -sin(angle), 0, cos(angle), 0,
+    -sin(rads), 0, cos(rads), 0,
     0,           0, 0,          1,
   ];
 }
@@ -165,5 +167,36 @@ export function rotationZM44(angle) {
     sin(angle), cos(angle),  0, 0,
     0, 0,          1,           0,
     0, 0,          0,           1,
+  ];
+}
+
+export function rotationXYZM44(xAngle, yAngle, zAngle) {
+  const xRads = xAngle * TORAD;
+  const yRads = yAngle * TORAD;
+  const zRads = zAngle * TORAD;
+
+  const sx = sin(xRads);
+  const cx = cos(xRads);
+  const sy = sin(yRads);
+  const cy = cos(yRads);
+  const sz = sin(zRads);
+  const cz = cos(zRads);
+
+  // prettier-ignore
+  return [
+    cx*cy, cx*sy*sz - sx*cz, cx*sy*cz + sx*sz, 0,
+    sx*cy, sx*sy*sz + cx*cz, sx*sy*cz - cx*sz, 0,
+    -sy,   cy*sz,            cy*cz,            0,
+    0,     0,                0,                1,
+  ];
+}
+
+export function moveXYZM44(xMove, yMove, zMove) {
+  // prettier-ignore
+  return [
+    1, 0, 0, xMove,
+    0, 1, 0, yMove,
+    0, 0, 1, zMove,
+    0, 0, 0, 1,
   ];
 }
