@@ -5,7 +5,7 @@ const defaultConfig = {
   lineNumbers: false,
   theme: 'improviz',
   performanceMode: false,
-  program: 'position.x -> osc(5) >> out;',
+  program: 'shape(:cube, 1, 1, 1)',
 };
 
 export function getConfig() {
