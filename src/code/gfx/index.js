@@ -1,6 +1,7 @@
 import { projectionMatrix, lookAt, vec3, identityM44 } from './matrices';
 import { makeShape, compileProgram, fragCode, vertCode } from './shaders';
 import { cube } from './geometries';
+import { multiplyM44 } from './matrices';
 
 import { Stack } from '../util/stack';
 
@@ -35,13 +36,14 @@ export class IGfx {
     );
   }
 
-  drawShape(name) {
+  drawShape(name, sizeMatrix) {
     const gl = this.ctx;
     const shape = this.geometries[name];
     const fill = this.fillStack.top();
+    const mMatrix = multiplyM44(sizeMatrix, this.matrixStack.top());
     gl.uniformMatrix4fv(shape.uniforms.Pmatrix, false, this.pMatrix);
     gl.uniformMatrix4fv(shape.uniforms.Vmatrix, false, this.vMatrix);
-    gl.uniformMatrix4fv(shape.uniforms.Mmatrix, false, this.matrixStack.top());
+    gl.uniformMatrix4fv(shape.uniforms.Mmatrix, false, mMatrix);
     gl.uniform4fv(shape.uniforms.Color, fill);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.buffers.index);
     gl.drawElements(
