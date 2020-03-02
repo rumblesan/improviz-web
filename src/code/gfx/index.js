@@ -20,8 +20,8 @@ export class IGfx {
     this.vMatrix = lookAt(vec3(0, 0, 10), vec3(0, 0, 0), vec3(0, 1, 0));
 
     this.matrixStack = new Stack(identityM44());
-    this.fillStack = new Stack([1, 1, 1]);
-    this.strokeStack = new Stack([1, 1, 1]);
+    this.fillStack = new Stack([1, 1, 1, 1]);
+    this.strokeStack = new Stack([1, 1, 1, 1]);
 
     this.geometries = {};
     this.loadShape('cube', cube, vertCode, fragCode);
@@ -42,7 +42,7 @@ export class IGfx {
     gl.uniformMatrix4fv(shape.uniforms.Pmatrix, false, this.pMatrix);
     gl.uniformMatrix4fv(shape.uniforms.Vmatrix, false, this.vMatrix);
     gl.uniformMatrix4fv(shape.uniforms.Mmatrix, false, this.matrixStack.top());
-    gl.uniform3fv(shape.uniforms.Color, fill);
+    gl.uniform4fv(shape.uniforms.Color, fill);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.buffers.index);
     gl.drawElements(
       gl.TRIANGLES,

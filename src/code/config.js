@@ -6,7 +6,7 @@ const defaultConfig = {
   theme: 'improviz',
   performanceMode: false,
   program:
-    't = time/100\nrotate(t, t, t)\nstyle(:fill, 0, 0.5, 0.8)\nshape(:cube, 1, 1, 1)',
+    't = time/100\nrotate(t, t, t)\nstyle(:fill, 0, 0.5, 0.8, 1)\nshape(:cube, 1, 1, 1)',
 };
 
 export function getConfig() {

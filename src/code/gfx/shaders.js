@@ -7,8 +7,8 @@ export const vertCode = dedent(`
   uniform mat4 Pmatrix;
   uniform mat4 Vmatrix;
   uniform mat4 Mmatrix;
-  uniform vec3 Color;
-  varying vec3 vColor;
+  uniform vec4 Color;
+  varying vec4 vColor;
   void main(void) { 
     gl_Position = ((Pmatrix * Vmatrix) * Mmatrix) * vec4(position, 1.);
     vColor = Color;
@@ -17,9 +17,9 @@ export const vertCode = dedent(`
 
 export const fragCode = dedent(`
   precision mediump float;
-  varying vec3 vColor;
+  varying vec4 vColor;
   void main(void) {
-    gl_FragColor = vec4(vColor, 1.);
+    gl_FragColor = vColor;
   }
 `);
 

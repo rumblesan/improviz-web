@@ -15,9 +15,10 @@ export function style(args) {
 }
 
 export function fill(args) {
-  let [r, g, b] = args;
+  let [r, g, b, a] = args;
   if (!isNum(r)) throw new InterpreterError('Expected Number', r);
   if (!isNum(g)) throw new InterpreterError('Expected Number', g);
   if (!isNum(b)) throw new InterpreterError('Expected Number', b);
-  this.fillStack.push([r.value, g.value, b.value]);
+  if (!isNum(a)) throw new InterpreterError('Expected Number', a);
+  this.fillStack.push([r.value, g.value, b.value, a.value]);
 }
