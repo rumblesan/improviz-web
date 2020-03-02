@@ -2,7 +2,7 @@ import { makeFunc, makeNum } from '../ffi';
 
 import { style } from './style';
 import { shape } from './shapes';
-import { rotate, move, scale } from './transforms';
+import { matrix } from './transforms';
 
 export class StdLib {
   constructor(runtime) {
@@ -13,9 +13,7 @@ export class StdLib {
   createScope() {
     return {
       shape: makeFunc('shape', shape.bind(this.runtime)),
-      rotate: makeFunc('rotate', rotate.bind(this.runtime)),
-      move: makeFunc('move', move.bind(this.runtime)),
-      scale: makeFunc('scale', scale.bind(this.runtime)),
+      matrix: makeFunc('matrix', matrix.bind(this.runtime)),
       style: makeFunc('style', style.bind(this.runtime)),
     };
   }

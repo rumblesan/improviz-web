@@ -1,5 +1,5 @@
 import { InterpreterError } from '../interpreter/errors';
-import { isNum } from '../ffi';
+import { isNum, isSymbol } from '../ffi';
 
 import {
   scaleXYZM44,
@@ -7,6 +7,25 @@ import {
   moveXYZM44,
   multiplyM44,
 } from '../../gfx/matrices';
+
+export function matrix(args) {
+  const s = args.shift();
+  if (!isSymbol(s))
+    throw new InterpreterError(`Expected Symbol but found ${s.type}`, s);
+  switch (s.value) {
+    case 'rotate':
+      rotate.call(this, args);
+      break;
+    case 'move':
+      move.call(this, args);
+      break;
+    case 'scale':
+      scale.call(this, args);
+      break;
+    default:
+      throw new InterpreterError('Unknown style command', s);
+  }
+}
 
 export function rotate(args) {
   let [x, y, z] = args;
