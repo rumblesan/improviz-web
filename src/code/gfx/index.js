@@ -4,6 +4,7 @@ import { cube } from './geometries';
 import { multiplyM44 } from './matrices';
 
 import { Stack } from '../util/stack';
+import { CrossFrameSetting } from '../util/cross-frame-setting';
 
 export class IGfx {
   constructor(canvasEl, context) {
@@ -24,6 +25,9 @@ export class IGfx {
     this.fillStack = new Stack({ style: 'fill', color: [1, 1, 1, 1] });
     this.strokeStack = new Stack({ style: 'stroke', color: [0, 0, 0, 1] });
     this.strokeSizeStack = new Stack(0.02);
+
+    this.background = new CrossFrameSetting([1, 1, 1]);
+    this.depthCheck = new CrossFrameSetting(true);
 
     this.geometries = {};
     this.loadShape('cube', cube, vertCode, fragCode);
@@ -93,14 +97,22 @@ export class IGfx {
     this.matrixStack.reset();
     this.fillStack.reset();
     this.strokeStack.reset();
+    this.background.reset();
 
     gl.frontFace(gl.CW);
     gl.enable(gl.CULL_FACE);
-    gl.enable(gl.DEPTH_TEST);
+    if (this.depthCheck.get()) {
+      gl.enable(gl.DEPTH_TEST);
+    } else {
+      gl.disable(gl.DEPTH_TEST);
+    }
     gl.depthFunc(gl.LEQUAL);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.clearColor(1, 1, 1, 1);
+
+    const [r, g, b] = this.background.get();
+    gl.clearColor(r, g, b, 1);
+
     gl.clearDepth(1.0);
 
     gl.viewport(0.0, 0.0, this.canvas.width, this.canvas.height);
