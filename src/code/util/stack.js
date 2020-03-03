@@ -20,10 +20,10 @@ export class Stack {
     this.position -= 1;
     return v;
   }
-  newSnapshot() {
+  pushSnapshot() {
     this.snapshotPositions.push(this.position);
   }
-  revertToLastSnapshot() {
+  popSnapshot() {
     const p = this.snapshotPositions.pop();
     this.position = p;
   }

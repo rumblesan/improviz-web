@@ -37,6 +37,20 @@ export class IGfx {
     );
   }
 
+  pushSnapshot() {
+    this.matrixStack.pushSnapshot();
+    this.fillStack.pushSnapshot();
+    this.strokeStack.pushSnapshot();
+    this.strokeSizeStack.pushSnapshot();
+  }
+
+  popSnapshot() {
+    this.matrixStack.popSnapshot();
+    this.fillStack.popSnapshot();
+    this.strokeStack.popSnapshot();
+    this.strokeSizeStack.popSnapshot();
+  }
+
   drawShape(name, sizeMatrix) {
     const gl = this.ctx;
     const shape = this.geometries[name];
