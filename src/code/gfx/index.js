@@ -21,8 +21,9 @@ export class IGfx {
     this.vMatrix = lookAt(vec3(0, 0, 10), vec3(0, 0, 0), vec3(0, 1, 0));
 
     this.matrixStack = new Stack(identityM44());
-    this.fillStack = new Stack([1, 1, 1, 1]);
-    this.strokeStack = new Stack([1, 1, 1, 1]);
+    this.fillStack = new Stack({ style: 'fill', color: [1, 1, 1, 1] });
+    this.strokeStack = new Stack({ style: 'stroke', color: [0, 0, 0, 1] });
+    this.strokeSizeStack = new Stack(0.02);
 
     this.geometries = {};
     this.loadShape('cube', cube, vertCode, fragCode);
@@ -39,12 +40,20 @@ export class IGfx {
   drawShape(name, sizeMatrix) {
     const gl = this.ctx;
     const shape = this.geometries[name];
-    const fill = this.fillStack.top();
+    const fillStyle = this.fillStack.top();
+    const fillColor =
+      fillStyle.style === 'fill' ? fillStyle.color : [0, 0, 0, 0];
+    const strokeStyle = this.strokeStack.top();
+    const strokeColor =
+      strokeStyle.style === 'stroke' ? strokeStyle.color : fillColor;
+    const strokeSize = this.strokeSizeStack.top();
     const mMatrix = multiplyM44(sizeMatrix, this.matrixStack.top());
     gl.uniformMatrix4fv(shape.uniforms.Pmatrix, false, this.pMatrix);
     gl.uniformMatrix4fv(shape.uniforms.Vmatrix, false, this.vMatrix);
     gl.uniformMatrix4fv(shape.uniforms.Mmatrix, false, mMatrix);
-    gl.uniform4fv(shape.uniforms.Color, fill);
+    gl.uniform4fv(shape.uniforms.Color, fillColor);
+    gl.uniform4fv(shape.uniforms.WireColor, strokeColor);
+    gl.uniform1f(shape.uniforms.StrokeSize, strokeSize);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.buffers.index);
     gl.drawElements(
       gl.TRIANGLES,
@@ -63,6 +72,8 @@ export class IGfx {
 
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LEQUAL);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.clearColor(1, 1, 1, 0.9);
     gl.clearDepth(1.0);
 

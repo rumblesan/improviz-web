@@ -9,23 +9,30 @@ export const vertCode = dedent(`
   uniform mat4 Vmatrix;
   uniform mat4 Mmatrix;
   uniform vec4 Color;
+  uniform vec4 WireColor;
+  uniform float StrokeSize;
   varying vec4 vColor;
+  varying vec4 vWireColor;
   varying vec3 vbc;
+  varying float vStrokeSize;
   void main(void) { 
     gl_Position = ((Pmatrix * Vmatrix) * Mmatrix) * vec4(position, 1.);
     vColor = Color;
+    vWireColor = WireColor;
     vbc = barycentric;
+    vStrokeSize = StrokeSize;
   }
 `);
 
 export const fragCode = dedent(`
   precision mediump float;
   varying vec4 vColor;
+  varying vec4 vWireColor;
   varying vec3 vbc;
-  float strokeSize = 0.1;
+  varying float vStrokeSize;
   void main(void) {
-    if(vbc.x < strokeSize || vbc.y < strokeSize || vbc.z < strokeSize) {
-      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    if(vbc.x < vStrokeSize || vbc.y < vStrokeSize || vbc.z < vStrokeSize) {
+      gl_FragColor = vWireColor;
     } else {
       gl_FragColor = vColor;
     }
@@ -56,6 +63,8 @@ export function makeShape(gl, program, geometry) {
   var Vmatrix = gl.getUniformLocation(program, 'Vmatrix');
   var Mmatrix = gl.getUniformLocation(program, 'Mmatrix');
   var Color = gl.getUniformLocation(program, 'Color');
+  var WireColor = gl.getUniformLocation(program, 'WireColor');
+  var StrokeSize = gl.getUniformLocation(program, 'StrokeSize');
 
   gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
   var position = gl.getAttribLocation(program, 'position');
@@ -77,6 +86,8 @@ export function makeShape(gl, program, geometry) {
       Vmatrix,
       Mmatrix,
       Color,
+      WireColor,
+      StrokeSize,
     },
     geometry,
   };
