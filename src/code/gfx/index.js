@@ -55,6 +55,16 @@ export class IGfx {
     gl.uniform4fv(shape.uniforms.WireColor, strokeColor);
     gl.uniform1f(shape.uniforms.StrokeSize, strokeSize);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.buffers.index);
+
+    gl.cullFace(gl.FRONT);
+    gl.drawElements(
+      gl.TRIANGLES,
+      shape.geometry.indices.length,
+      gl.UNSIGNED_SHORT,
+      0
+    );
+
+    gl.cullFace(gl.BACK);
     gl.drawElements(
       gl.TRIANGLES,
       shape.geometry.indices.length,
@@ -70,11 +80,13 @@ export class IGfx {
     this.fillStack.reset();
     this.strokeStack.reset();
 
+    gl.frontFace(gl.CW);
+    gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LEQUAL);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.clearColor(1, 1, 1, 0.9);
+    gl.clearColor(1, 1, 1, 1);
     gl.clearDepth(1.0);
 
     gl.viewport(0.0, 0.0, this.canvas.width, this.canvas.height);
