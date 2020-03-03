@@ -8,12 +8,12 @@ export function createBuffers(gl, geometry) {
     gl.STATIC_DRAW
   );
 
-  // Create and store data into color buffer
-  const colorBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+  // Create and store data into wireframe buffer
+  const wireframeBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, wireframeBuffer);
   gl.bufferData(
     gl.ARRAY_BUFFER,
-    new Float32Array(geometry.colors),
+    new Float32Array(geometry.barycentrics),
     gl.STATIC_DRAW
   );
 
@@ -28,7 +28,7 @@ export function createBuffers(gl, geometry) {
 
   return {
     vertex: vertexBuffer,
-    color: colorBuffer,
+    wireframe: wireframeBuffer,
     index: indexBuffer,
   };
 }
