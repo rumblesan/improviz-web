@@ -130,6 +130,7 @@ export class Parser extends VirgilParser {
     const t = this.peek();
     this.errors.push(new ParserException(`Unexpected ${t.type}`));
     this.skipUntil(['newline']);
+    this.clearNewlines();
   }
 
   block(blockDepth) {
@@ -177,6 +178,7 @@ export class Parser extends VirgilParser {
     const t = this.peek();
     this.errors.push(new ParserException(`Unexpected ${t.type}`));
     this.skipUntil(['newline']);
+    this.clearNewlines();
   }
 
   if(blockDepth) {
@@ -349,7 +351,6 @@ export class Parser extends VirgilParser {
   application(blockDepth, idToken) {
     this.debugLog('Application');
 
-    this.blockDepthCheck(blockDepth, idToken);
     const position = this.tokenPosition(idToken);
 
     let args;
