@@ -46,7 +46,7 @@
     "webpack-dev-server": "3.10.3"
   },
   "dependencies": {
-    "@rumblesan/virgil": "0.0.6",
+    "@rumblesan/virgil": "0.0.7",
     "dentist": "1.0.3"
   },
   "jest": {
