@@ -11,6 +11,7 @@ import * as templates from './templates';
 
 import { clickHandler } from './code/dom';
 import { getConfig } from './code/config';
+import { encodeProgram } from './code/encoder';
 
 import { EventBus } from './code/event-bus';
 import { Popups } from './code/ui/popups';
@@ -44,6 +45,17 @@ if (!gl) {
   const gfx = new IGfx(canvas, gl);
 
   const improviz = new Improviz(config, eventBus, CodeMirror, gfx);
+
+  popups.register('sharing', true, () => {
+    const encodedProgram = encodeProgram(improviz.getProgram());
+    const programSharingURL = URL.fromLocation();
+    programSharingURL.searchParams.set('program', encodedProgram);
+    // TODO maybe make the entire URL clear of params???
+    programSharingURL.hash = '';
+    return templates.sharingPopup({
+      programSharingURL: programSharingURL.toString(),
+    });
+  });
 
   popups.register('settings', true, () => {
     const defaultKeymapURL = URL.fromLocation();
