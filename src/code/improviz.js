@@ -7,7 +7,10 @@ export class Improviz {
     this.parser = new Parser();
     this.stdlib = new StdLib(gfx);
     this.interpreter = new Interpreter(this.stdlib);
+    this.lastWorkingProgram = null;
+    this.workingCount = 0;
     this.currentProgram = null;
+    this.runtimeErrors = [];
 
     this.editor = CodeMirror(
       el => {
@@ -24,8 +27,14 @@ export class Improviz {
         lint: {
           getAnnotations: program => {
             const { errors } = this.parser.parse(program);
+            let annotations;
+            if (errors.length > 0) {
+              annotations = errors;
+            } else {
+              annotations = this.runtimeErrors;
+            }
 
-            return errors.map(err => ({
+            return annotations.map(err => ({
               from: CodeMirror.Pos(err.line - 1, err.character - 1),
               to: CodeMirror.Pos(err.line - 1, err.character - 1 + err.length),
               message: err.message,
@@ -47,14 +56,20 @@ export class Improviz {
     return this.editor.getValue();
   }
 
+  resetToLastWorkingProgram() {
+    this.currentProgram = this.lastWorkingProgram;
+    this.workingCount = 0;
+  }
+
   evaluate() {
     try {
+      this.runtimeErrors = [];
       const program = this.editor.getValue();
       const result = this.parser.parse(program);
-      console.log(result);
       if (result.errors.length < 1) {
         this.eventBus.emit('clear-error');
         this.currentProgram = result.ast;
+        this.workingCount = 0;
       } else {
         const errCount = result.errors.length;
         const msg = errCount === 1 ? '1 Error!' : `${errCount} Errors!`;
@@ -69,7 +84,21 @@ export class Improviz {
     const animate = time => {
       this.gfx.reset();
       this.stdlib.setTime(time);
-      this.interpreter.run(this.currentProgram, this.stdlib.scope);
+      const result = this.interpreter.run(
+        this.currentProgram,
+        this.stdlib.scope
+      );
+      if (result.exitCode === 0) {
+        this.workingCount += 1;
+        if (this.workingCount === 10) {
+          this.lastWorkingProgram = this.currentProgram;
+        }
+      } else {
+        this.workingCount = 0;
+        this.currentProgram = this.lastWorkingProgram;
+        this.runtimeErrors = result.errors;
+        this.editor.performLint();
+      }
       window.requestAnimationFrame(animate);
     };
     animate(0);
