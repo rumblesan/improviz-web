@@ -1,7 +1,7 @@
 import {
   ArithmaticShunter,
   Parser as VirgilParser,
-  ParserException,
+  UnexpectedTokenException,
 } from '@rumblesan/virgil';
 
 import * as Lexer from './lexer';
@@ -128,7 +128,7 @@ export class Parser extends VirgilParser {
       }
     }
     const t = this.peek();
-    this.errors.push(new ParserException(`Unexpected ${t.type}`));
+    this.errors.push(new UnexpectedTokenException(`Unexpected ${t.type}`, t));
     this.skipUntil(['newline']);
     this.clearNewlines();
   }
@@ -176,7 +176,7 @@ export class Parser extends VirgilParser {
       }
     }
     const t = this.peek();
-    this.errors.push(new ParserException(`Unexpected ${t.type}`));
+    this.errors.push(new UnexpectedTokenException(`Unexpected ${t.type}`, t));
     this.skipUntil(['newline']);
     this.clearNewlines();
   }

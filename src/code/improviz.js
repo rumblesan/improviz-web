@@ -18,9 +18,21 @@ export class Improviz {
         lineNumbers: config.lineNumbers,
         theme: config.theme,
         value: config.program,
-        mode: 'snek',
+        mode: 'improviz',
         autofocus: true,
         gutters: ['CodeMirror-lint-markers'],
+        lint: {
+          getAnnotations: program => {
+            const { errors } = this.parser.parse(program);
+
+            return errors.map(err => ({
+              from: CodeMirror.Pos(err.line - 1, err.character - 1),
+              to: CodeMirror.Pos(err.line - 1, err.character - 1 + err.length),
+              message: err.message,
+              severity: 'error',
+            }));
+          },
+        },
         extraKeys: {
           'Ctrl-Enter': () => this.evaluate(),
         },
