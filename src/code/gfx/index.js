@@ -98,6 +98,7 @@ export class IGfx {
     this.fillStack.reset();
     this.strokeStack.reset();
     this.background.reset();
+    this.depthCheck.reset();
 
     gl.frontFace(gl.CW);
     gl.enable(gl.CULL_FACE);
