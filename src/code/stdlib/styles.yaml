@@ -1,0 +1,56 @@
+styleFunctions:
+  - name: fill
+    code: |
+      func fill(r, g, b, a, &blk)
+        r := 255
+        g := r
+        b := r
+        a := 255
+        s = :fill
+        if (isNull(blk))
+          style(s, r, g, b, a)
+        else
+          pushSnapshot()
+          style(s, r, g, b, a)
+          blk()
+          popSnapshot()
+
+  - name: noFill
+    code: |
+      func noFill(&blk)
+        s = :noFill
+        if (isNull(blk))
+          style(s)
+        else
+          pushSnapshot()
+          style(s)
+          blk()
+          popSnapshot()
+
+  - name: stroke
+    code: |
+      func stroke(r, g, b, a, &blk)
+        r := 255
+        g := r
+        b := r
+        a := 255
+        s = :stroke
+        if (isNull(blk))
+          style(s, r, g, b, a)
+        else
+          pushSnapshot()
+          style(s, r, g, b, a)
+          blk()
+          popSnapshot()
+
+  - name: noStroke
+    code: |
+      func noStroke(&blk)
+        s = :noStroke
+        if (isNull(blk))
+          style(s)
+        else
+          pushSnapshot()
+          style(s)
+          blk()
+          popSnapshot()

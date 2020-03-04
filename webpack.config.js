@@ -40,6 +40,10 @@ module.exports = {
         use: ['source-map-loader'],
         enforce: 'pre',
       },
+      {
+        test: /\.ya?ml$/,
+        loader: 'js-yaml-loader',
+      },
     ],
   },
   resolve: {

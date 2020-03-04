@@ -1,0 +1,44 @@
+shapeFunctions:
+  - name: triangle
+    code: |
+      func triangle(x, y)
+        x := 1
+        y := x*0.866
+        shape(:triangle, x, y, 1)
+
+  - name: cube
+    code: |
+      func cube(x, y, z)
+        x := 1
+        y := x
+        z := y
+        shape(:cube, x, y, z)
+
+  - name: sphere
+    code: |
+      func sphere(x, y, z)
+        x := 1
+        y := x
+        z := y
+        shape(:sphere, x, y, z)
+
+  - name: cylinder
+    code: |
+      func cylinder(x, y, z)
+        x := 1
+        y := x
+        z := y
+        shape(:cylinder, x, y, z)
+
+  - name: rectangle
+    code: |
+      func rectangle(x, y)
+        x := 1
+        y := x
+        shape(:rectangle, x, y, 1)
+
+  - name: line
+    code: |
+      func line(x)
+        x := 1
+        shape(:line, x, 1, 1)

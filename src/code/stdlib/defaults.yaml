@@ -1,0 +1,10 @@
+defaults:
+  - name: bpm
+    code: |
+      bpm = 120
+  - name: nudge
+    code: |
+      nudge = 0
+  - name: pi
+    code: |
+      pi = 3.14159265

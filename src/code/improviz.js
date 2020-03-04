@@ -5,8 +5,8 @@ export class Improviz {
     this.eventBus = eventBus;
     this.gfx = gfx;
     this.parser = new Parser();
-    this.stdlib = new StdLib(gfx);
-    this.interpreter = new Interpreter(this.stdlib);
+    this.interpreter = new Interpreter();
+    this.stdlib = new StdLib(gfx, this.parser, this.interpreter);
     this.lastWorkingProgram = null;
     this.workingCount = 0;
     this.currentProgram = null;
@@ -47,9 +47,6 @@ export class Improviz {
         },
       }
     );
-    this.evaluate();
-
-    this.eventBus.on('evaluate', () => this.evaluate());
   }
 
   getProgram() {
@@ -81,6 +78,10 @@ export class Improviz {
   }
 
   start() {
+    this.evaluate();
+
+    this.eventBus.on('evaluate', () => this.evaluate());
+
     const animate = time => {
       this.gfx.reset();
       this.stdlib.setTime(time);
@@ -97,6 +98,7 @@ export class Improviz {
         this.workingCount = 0;
         this.currentProgram = this.lastWorkingProgram;
         this.runtimeErrors = result.errors;
+        console.log(result.errors);
         this.editor.performLint();
       }
       window.requestAnimationFrame(animate);

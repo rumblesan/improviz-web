@@ -1,5 +1,9 @@
 import { BuiltIn, Num } from './ast';
-import { NUM, SYMBOL } from './ast/nodes';
+import { NULL, NUM, SYMBOL } from './ast/nodes';
+
+export function isNull(value) {
+  return value && value.type === NULL;
+}
 
 export function isNum(value) {
   return value && value.type === NUM;
