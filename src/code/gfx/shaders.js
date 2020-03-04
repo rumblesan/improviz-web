@@ -5,12 +5,14 @@ import { createBuffers } from './buffers';
 export const vertCode = dedent(`
   attribute vec3 position;
   attribute vec3 barycentric;
+
   uniform mat4 Pmatrix;
   uniform mat4 Vmatrix;
   uniform mat4 Mmatrix;
   uniform vec4 Color;
   uniform vec4 WireColor;
   uniform float StrokeSize;
+
   varying vec4 vColor;
   varying vec4 vWireColor;
   varying vec3 vbc;
@@ -26,10 +28,12 @@ export const vertCode = dedent(`
 
 export const fragCode = dedent(`
   precision mediump float;
+
   varying vec4 vColor;
   varying vec4 vWireColor;
   varying vec3 vbc;
   varying float vStrokeSize;
+
   void main(void) {
     if(vbc.x < vStrokeSize || vbc.y < vStrokeSize || vbc.z < vStrokeSize) {
       gl_FragColor = vWireColor;
@@ -59,24 +63,30 @@ export function compileProgram(gl, vc, fc) {
 export function makeShape(gl, program, geometry) {
   const buffers = createBuffers(gl, geometry);
 
-  var Pmatrix = gl.getUniformLocation(program, 'Pmatrix');
-  var Vmatrix = gl.getUniformLocation(program, 'Vmatrix');
-  var Mmatrix = gl.getUniformLocation(program, 'Mmatrix');
-  var Color = gl.getUniformLocation(program, 'Color');
-  var WireColor = gl.getUniformLocation(program, 'WireColor');
-  var StrokeSize = gl.getUniformLocation(program, 'StrokeSize');
+  const Pmatrix = gl.getUniformLocation(program, 'Pmatrix');
+  const Vmatrix = gl.getUniformLocation(program, 'Vmatrix');
+  const Mmatrix = gl.getUniformLocation(program, 'Mmatrix');
+  const Color = gl.getUniformLocation(program, 'Color');
+  const WireColor = gl.getUniformLocation(program, 'WireColor');
+  const StrokeSize = gl.getUniformLocation(program, 'StrokeSize');
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-  var position = gl.getAttribLocation(program, 'position');
-  gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 0, 0);
+  const position = gl.getAttribLocation(program, 'position');
+  const barycentric = gl.getAttribLocation(program, 'barycentric');
+
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+
   gl.enableVertexAttribArray(position);
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+  gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 0, 0);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.wireframe);
-  var barycentric = gl.getAttribLocation(program, 'barycentric');
-  gl.vertexAttribPointer(barycentric, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(barycentric);
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.wireframe);
+  gl.vertexAttribPointer(barycentric, 3, gl.FLOAT, false, 0, 0);
 
-  gl.useProgram(program);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+
+  gl.bindVertexArray(null);
 
   return {
     program,
@@ -89,6 +99,11 @@ export function makeShape(gl, program, geometry) {
       WireColor,
       StrokeSize,
     },
+    attributes: {
+      position,
+      barycentric,
+    },
+    vao,
     geometry,
   };
 }

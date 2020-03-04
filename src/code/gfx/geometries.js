@@ -1,8 +1,38 @@
+export const triangle = {
+  // prettier-ignore
+  vertices: [
+    0, 0.5, 0,  0.5,-0.5, 0,  -0.5,-0.5, 0,
+  ],
+  // prettier-ignore
+  indices: [
+    0, 1, 2,
+  ],
+  // prettier-ignore
+  barycentrics: [
+    0, 0, 1,  0, 1, 0,  1, 0, 0,
+  ]
+};
+
+export const rectangle = {
+  // prettier-ignore
+  vertices: [
+    -0.5, -0.5, 0,  0.5, -0.5, 0,  0.5, 0.5, 0,  -0.5, 0.5, 0,
+  ],
+  // prettier-ignore
+  indices: [
+    0, 1, 2,  0, 2, 3,
+  ],
+  // prettier-ignore
+  barycentrics: [
+    0, 0, 1,  0, 1, 0,  1, 1, 0,  0, 1, 0,
+  ]
+};
+
 export const cube = {
   // prettier-ignore
   vertices: [
-    -1,-1,-1,   1,-1,-1,   1, 1,-1,  -1, 1,-1,
-    -1,-1, 1,   1,-1, 1,   1, 1, 1,  -1, 1, 1,
+    -0.5,-0.5,-0.5,  0.5,-0.5,-0.5,  0.5, 0.5,-0.5,  -0.5, 0.5,-0.5,
+    -0.5,-0.5, 0.5,  0.5,-0.5, 0.5,  0.5, 0.5, 0.5,  -0.5, 0.5, 0.5,
   ],
   // prettier-ignore
   indices: [
@@ -12,7 +42,7 @@ export const cube = {
   ],
   // prettier-ignore
   barycentrics: [
-    0, 0, 1,   0, 1, 0,   1, 1, 0,   0, 1, 0,
-    1, 0, 1,   0, 0, 1,   0, 1, 0,   0, 0, 1,
+    0, 0, 1,  0, 1, 0,  1, 1, 0,  0, 1, 0,
+    1, 0, 1,  0, 0, 1,  0, 1, 0,  0, 0, 1,
   ]
 };

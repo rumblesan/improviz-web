@@ -1,6 +1,6 @@
 import { projectionMatrix, lookAt, vec3, identityM44 } from './matrices';
 import { makeShape, compileProgram, fragCode, vertCode } from './shaders';
-import { cube } from './geometries';
+import { triangle, rectangle, cube } from './geometries';
 import { multiplyM44 } from './matrices';
 
 import { Stack } from '../util/stack';
@@ -30,7 +30,9 @@ export class IGfx {
     this.depthCheck = new CrossFrameSetting(true);
 
     this.geometries = {};
+    this.loadShape('triangle', triangle, vertCode, fragCode);
     this.loadShape('cube', cube, vertCode, fragCode);
+    this.loadShape('rectangle', rectangle, vertCode, fragCode);
   }
 
   loadShape(name, geometry, vertShader, fragShader) {
@@ -66,13 +68,17 @@ export class IGfx {
       strokeStyle.style === 'stroke' ? strokeStyle.color : fillColor;
     const strokeSize = this.strokeSizeStack.top();
     const mMatrix = multiplyM44(sizeMatrix, this.matrixStack.top());
+
+    gl.useProgram(shape.program);
+
     gl.uniformMatrix4fv(shape.uniforms.Pmatrix, false, this.pMatrix);
     gl.uniformMatrix4fv(shape.uniforms.Vmatrix, false, this.vMatrix);
     gl.uniformMatrix4fv(shape.uniforms.Mmatrix, false, mMatrix);
     gl.uniform4fv(shape.uniforms.Color, fillColor);
     gl.uniform4fv(shape.uniforms.WireColor, strokeColor);
     gl.uniform1f(shape.uniforms.StrokeSize, strokeSize);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.buffers.index);
+
+    gl.bindVertexArray(shape.vao);
 
     gl.cullFace(gl.FRONT);
     gl.drawElements(
