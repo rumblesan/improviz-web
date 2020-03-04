@@ -23,6 +23,8 @@ import {
 
 import { Lambda, Num, Null } from '../ast';
 
+import { InterpreterError } from './errors';
+
 function createChildScope(parentScope) {
   return Object.create(parentScope);
 }
@@ -34,6 +36,7 @@ export class Interpreter {
 
   run(ast, globalscope) {
     const state = {
+      errors: [],
       exitCode: 0,
     };
 
@@ -42,7 +45,12 @@ export class Interpreter {
       return state;
     }
 
-    this.evaluateProgram(ast, globalscope);
+    try {
+      this.evaluateProgram(ast, globalscope);
+    } catch (e) {
+      state.errors.push(e);
+      state.exitCode = 1;
+    }
     return state;
   }
 
@@ -118,7 +126,7 @@ export class Interpreter {
         break;
 
       default:
-        throw `Unknown AST Type: ${node.type}`;
+        throw new InterpreterError(`Unknown AST Type: ${node.type}`, node);
     }
 
     return output;
@@ -165,7 +173,10 @@ export class Interpreter {
 
   checkNum(value) {
     if (!value || value.type !== NUM) {
-      throw 'Expected Number';
+      throw new InterpreterError(
+        `Expected Number but found: ${value.type}`,
+        value
+      );
     }
   }
 
@@ -184,7 +195,7 @@ export class Interpreter {
 
     const func = scope[name];
     if (!func || !(func.type !== LAMBDA || func.type !== BUILTIN)) {
-      throw `${name} is not a function`;
+      throw new InterpreterError(`${name} is not a function`, application);
     }
 
     const argValues = args.map(a => this.evaluate(a, scope));
@@ -216,8 +227,8 @@ export class Interpreter {
   }
 
   // FIXME
-  evaluateLambda() {
-    throw "Shouldn't be evaluating a lambda"();
+  evaluateLambda(node) {
+    throw new InterpreterError(`Shouldn't be evaluating a lambda`, node);
   }
 
   evaluateFunctionDefinition(funcDef, scope) {
@@ -231,7 +242,7 @@ export class Interpreter {
 
     const loops = this.evaluate(count, scope);
     if (loops.type !== NUM) {
-      throw 'Loop count should be number';
+      throw new InterpreterError('Loop count should be a number', count);
     }
     const loopValue = loops.value;
     const childScope = createChildScope(scope);
@@ -257,7 +268,10 @@ export class Interpreter {
         break;
 
       default:
-        throw 'Unknown Operator: ' + operation.operator;
+        throw new InterpreterError(
+          `${operation.operator} is an unknown operator`,
+          operation
+        );
     }
 
     return Num(output);
@@ -326,7 +340,10 @@ export class Interpreter {
         break;
 
       default:
-        throw 'Unknown Operator: ' + binaryOp.operator;
+        throw new InterpreterError(
+          `${binaryOp.operator} is an unknown operator`,
+          binaryOp
+        );
     }
 
     return Num(output);
@@ -335,7 +352,10 @@ export class Interpreter {
   evaluateVariable(variable, scope) {
     const output = scope[variable.identifier];
     if (!this.notNull(output)) {
-      throw 'Undefined Variable: ' + variable.identifier;
+      throw new InterpreterError(
+        `Undefined Variable: ${variable.identifier}`,
+        variable
+      );
     }
     return output;
   }
@@ -343,7 +363,7 @@ export class Interpreter {
   evaluateDeIndex(deindex, scope) {
     const collection = this.evaluate(deindex.collection, scope);
     if (!Array.isArray(collection)) {
-      throw 'Must deindex lists';
+      throw new InterpreterError('Can only deindex a list', deindex);
     }
     const index = this.evaluate(deindex.index, scope);
     this.checkNum(index);

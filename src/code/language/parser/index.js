@@ -43,12 +43,6 @@ export class Parser extends VirgilParser {
     return Math.round((token.character - 1) / indentPerBlock);
   }
 
-  tokenPosition(token) {
-    if (this.testing) return {};
-
-    return { line: token.line, character: token.character };
-  }
-
   blockDepthCheck(currentBlockDepth, token) {
     const nextBlockDepth = this.calculateBlockLevel(token);
     if (currentBlockDepth !== nextBlockDepth) {
