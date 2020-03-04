@@ -1,3 +1,13 @@
+import { createBuffers } from './buffers';
+
+export function loadGeometry(gl, geometry) {
+  const buffers = createBuffers(gl, geometry);
+  return {
+    buffers,
+    geometry,
+  };
+}
+
 export const triangle = {
   // prettier-ignore
   vertices: [

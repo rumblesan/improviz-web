@@ -1,10 +1,13 @@
 import { projectionMatrix, lookAt, vec3, identityM44 } from './matrices';
-import { makeShape, compileProgram, fragCode, vertCode } from './shaders';
-import { triangle, rectangle, cube } from './geometries';
+import { loadMaterial } from './shaders';
+import { loadGeometry, triangle, rectangle, cube } from './geometries';
 import { multiplyM44 } from './matrices';
 
 import { Stack } from '../util/stack';
 import { CrossFrameSetting } from '../util/cross-frame-setting';
+
+import { material as basicMaterial } from './materials/basic.yaml';
+import { material as weirdMaterial } from './materials/weird.yaml';
 
 export class IGfx {
   constructor(canvasEl, context) {
@@ -25,22 +28,21 @@ export class IGfx {
     this.fillStack = new Stack({ style: 'fill', color: [1, 1, 1, 1] });
     this.strokeStack = new Stack({ style: 'stroke', color: [0, 0, 0, 1] });
     this.strokeSizeStack = new Stack(0.02);
+    this.materialStack = new Stack('basic');
 
     this.background = new CrossFrameSetting([1, 1, 1]);
     this.depthCheck = new CrossFrameSetting(true);
 
-    this.geometries = {};
-    this.loadShape('triangle', triangle, vertCode, fragCode);
-    this.loadShape('cube', cube, vertCode, fragCode);
-    this.loadShape('rectangle', rectangle, vertCode, fragCode);
-  }
+    this.geometries = {
+      triangle: loadGeometry(this.ctx, triangle),
+      cube: loadGeometry(this.ctx, cube),
+      rectangle: loadGeometry(this.ctx, rectangle),
+    };
 
-  loadShape(name, geometry, vertShader, fragShader) {
-    this.geometries[name] = makeShape(
-      this.ctx,
-      compileProgram(this.ctx, vertShader, fragShader),
-      geometry
-    );
+    this.materials = {
+      basic: loadMaterial(this.ctx, basicMaterial),
+      weird: loadMaterial(this.ctx, weirdMaterial),
+    };
   }
 
   pushSnapshot() {
@@ -69,16 +71,45 @@ export class IGfx {
     const strokeSize = this.strokeSizeStack.top();
     const mMatrix = multiplyM44(sizeMatrix, this.matrixStack.top());
 
-    gl.useProgram(shape.program);
+    const materialName = this.materialStack.top();
+    const material = this.materials[materialName];
+    // FIXME raise an error?
+    if (!material) return;
 
-    gl.uniformMatrix4fv(shape.uniforms.Pmatrix, false, this.pMatrix);
-    gl.uniformMatrix4fv(shape.uniforms.Vmatrix, false, this.vMatrix);
-    gl.uniformMatrix4fv(shape.uniforms.Mmatrix, false, mMatrix);
-    gl.uniform4fv(shape.uniforms.Color, fillColor);
-    gl.uniform4fv(shape.uniforms.WireColor, strokeColor);
-    gl.uniform1f(shape.uniforms.StrokeSize, strokeSize);
+    gl.useProgram(material.program);
 
-    gl.bindVertexArray(shape.vao);
+    gl.uniformMatrix4fv(material.uniforms.Pmatrix, false, this.pMatrix);
+    gl.uniformMatrix4fv(material.uniforms.Vmatrix, false, this.vMatrix);
+    gl.uniformMatrix4fv(material.uniforms.Mmatrix, false, mMatrix);
+    gl.uniform4fv(material.uniforms.Color, fillColor);
+    gl.uniform4fv(material.uniforms.WireColor, strokeColor);
+    gl.uniform1f(material.uniforms.StrokeSize, strokeSize);
+
+    gl.enableVertexAttribArray(material.attributes.position);
+    gl.bindBuffer(gl.ARRAY_BUFFER, shape.buffers.vertex);
+    gl.vertexAttribPointer(
+      material.attributes.position,
+      3,
+      gl.FLOAT,
+      false,
+      0,
+      0
+    );
+
+    gl.enableVertexAttribArray(material.attributes.barycentric);
+    gl.bindBuffer(gl.ARRAY_BUFFER, shape.buffers.wireframe);
+    gl.vertexAttribPointer(
+      material.attributes.barycentric,
+      3,
+      gl.FLOAT,
+      false,
+      0,
+      0
+    );
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.buffers.index);
+
+    //gl.bindVertexArray(shape.vao);
 
     gl.cullFace(gl.FRONT);
     gl.drawElements(

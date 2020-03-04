@@ -21,6 +21,9 @@ export function style(args) {
     case 'strokeSize':
       strokeSize.call(this, args);
       break;
+    case 'material':
+      material.call(this, args);
+      break;
     default:
       throw new InterpreterError('Unknown style command', s);
   }
@@ -54,4 +57,10 @@ export function strokeSize(args) {
   let [s] = args;
   if (!isNum(s)) throw new InterpreterError('Expected Number', s);
   this.strokeSizeStack.push(s.value);
+}
+
+export function material(args) {
+  let [name] = args;
+  if (!isSymbol(name)) throw new InterpreterError('Expected Symbol', name);
+  this.materialStack.push(name.value);
 }

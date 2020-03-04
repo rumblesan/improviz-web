@@ -1,109 +1,75 @@
-import { dedent } from 'dentist';
+import { GFXError } from './errors';
 
-import { createBuffers } from './buffers';
+export function loadMaterial(gl, surface) {
+  const program = compileShaderProgram(
+    gl,
+    surface.vertexShader,
+    surface.fragmentShader
+  );
 
-export const vertCode = dedent(`
-  attribute vec3 position;
-  attribute vec3 barycentric;
-
-  uniform mat4 Pmatrix;
-  uniform mat4 Vmatrix;
-  uniform mat4 Mmatrix;
-  uniform vec4 Color;
-  uniform vec4 WireColor;
-  uniform float StrokeSize;
-
-  varying vec4 vColor;
-  varying vec4 vWireColor;
-  varying vec3 vbc;
-  varying float vStrokeSize;
-  void main(void) { 
-    gl_Position = ((Pmatrix * Vmatrix) * Mmatrix) * vec4(position, 1.);
-    vColor = Color;
-    vWireColor = WireColor;
-    vbc = barycentric;
-    vStrokeSize = StrokeSize;
-  }
-`);
-
-export const fragCode = dedent(`
-  precision mediump float;
-
-  varying vec4 vColor;
-  varying vec4 vWireColor;
-  varying vec3 vbc;
-  varying float vStrokeSize;
-
-  void main(void) {
-    if(vbc.x < vStrokeSize || vbc.y < vStrokeSize || vbc.z < vStrokeSize) {
-      gl_FragColor = vWireColor;
-    } else {
-      gl_FragColor = vColor;
+  const attributeLocations = {};
+  surface.attributes.forEach(aName => {
+    console.log('attributes', aName);
+    const attrib = gl.getAttribLocation(program, aName);
+    if (attrib === null) {
+      // TODO include gl.getError info
+      throw new GFXError(`WebGL could not get ${aName} attribute location`);
     }
-  }
-`);
+    attributeLocations[aName] = attrib;
+  });
 
-export function compileProgram(gl, vc, fc) {
+  const uniformLocations = {};
+  surface.uniforms.forEach(uName => {
+    const uniform = gl.getUniformLocation(program, uName);
+    if (uniform === null) {
+      // TODO include gl.getError info
+      throw new GFXError(`WebGL could not get ${uName} uniform location`);
+    }
+    uniformLocations[uName] = uniform;
+  });
+
+  return {
+    program,
+    attributes: attributeLocations,
+    uniforms: uniformLocations,
+  };
+}
+
+export function compileShaderProgram(gl, vc, fc) {
   const vertShader = gl.createShader(gl.VERTEX_SHADER);
+  if (vertShader === null) {
+    throw new GFXError('WebGL could not create vertex shader');
+  }
   gl.shaderSource(vertShader, vc);
   gl.compileShader(vertShader);
+  if (!gl.getShaderParameter(vertShader, gl.COMPILE_STATUS)) {
+    throw new GFXError(
+      `Could not compile vertex shader: ${gl.getShaderInfoLog(vertShader)}`
+    );
+  }
 
   const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+  if (fragShader === null) {
+    throw new GFXError('WebGL could not create fragment shader');
+  }
   gl.shaderSource(fragShader, fc);
   gl.compileShader(fragShader);
+  if (!gl.getShaderParameter(fragShader, gl.COMPILE_STATUS)) {
+    throw new GFXError(
+      `Could not compile fragment shader: ${gl.getShaderInfoLog(fragShader)}`
+    );
+  }
 
   const program = gl.createProgram();
   gl.attachShader(program, vertShader);
   gl.attachShader(program, fragShader);
   gl.linkProgram(program);
 
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    throw new GFXError(
+      `Could not compile shader program: ${gl.getShaderInfoLog(program)}`
+    );
+  }
+
   return program;
-}
-
-export function makeShape(gl, program, geometry) {
-  const buffers = createBuffers(gl, geometry);
-
-  const Pmatrix = gl.getUniformLocation(program, 'Pmatrix');
-  const Vmatrix = gl.getUniformLocation(program, 'Vmatrix');
-  const Mmatrix = gl.getUniformLocation(program, 'Mmatrix');
-  const Color = gl.getUniformLocation(program, 'Color');
-  const WireColor = gl.getUniformLocation(program, 'WireColor');
-  const StrokeSize = gl.getUniformLocation(program, 'StrokeSize');
-
-  const position = gl.getAttribLocation(program, 'position');
-  const barycentric = gl.getAttribLocation(program, 'barycentric');
-
-  const vao = gl.createVertexArray();
-  gl.bindVertexArray(vao);
-
-  gl.enableVertexAttribArray(position);
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-  gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 0, 0);
-
-  gl.enableVertexAttribArray(barycentric);
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.wireframe);
-  gl.vertexAttribPointer(barycentric, 3, gl.FLOAT, false, 0, 0);
-
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
-
-  gl.bindVertexArray(null);
-
-  return {
-    program,
-    buffers,
-    uniforms: {
-      Pmatrix,
-      Vmatrix,
-      Mmatrix,
-      Color,
-      WireColor,
-      StrokeSize,
-    },
-    attributes: {
-      position,
-      barycentric,
-    },
-    vao,
-    geometry,
-  };
 }
