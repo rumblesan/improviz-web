@@ -83,10 +83,15 @@ if (!gl) {
     });
   });
 
+  popups.register('help', true, () => {
+    return templates.helpPopup();
+  });
+
   clickHandler('#evaluate', () => eventBus.emit('evaluate'));
   clickHandler('#display-sharing', () =>
     eventBus.emit('display-popup', 'sharing')
   );
+  clickHandler('#display-help', () => eventBus.emit('display-popup', 'help'));
   clickHandler('#display-settings', () =>
     eventBus.emit('display-popup', 'settings')
   );
