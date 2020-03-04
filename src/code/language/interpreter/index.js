@@ -30,11 +30,7 @@ function createChildScope(parentScope) {
 }
 
 export class Interpreter {
-  constructor(stdlib) {
-    this.stdlib = stdlib;
-  }
-
-  run(ast, globalscope) {
+  run(ast, globalScope, loadingExternals) {
     const state = {
       errors: [],
       exitCode: 0,
@@ -45,8 +41,14 @@ export class Interpreter {
       return state;
     }
 
+    let programScope;
+    if (loadingExternals) {
+      programScope = globalScope;
+    } else {
+      programScope = createChildScope(globalScope);
+    }
     try {
-      this.evaluateProgram(ast, globalscope);
+      this.evaluateProgram(ast, programScope);
     } catch (e) {
       state.errors.push(e);
       state.exitCode = 1;
@@ -55,10 +57,9 @@ export class Interpreter {
   }
 
   evaluateProgram(ast, scope) {
-    const childScope = createChildScope(scope);
     for (let i = 0; i < ast.statements.length; i += 1) {
       const el = ast.statements[i];
-      this.evaluate(el, childScope);
+      this.evaluate(el, scope);
     }
   }
 
@@ -183,7 +184,7 @@ export class Interpreter {
   evaluateIf(ifStatement, scope) {
     const { conditionals } = ifStatement;
     for (let i = 0; i < conditionals.length; i += 1) {
-      const { pred, block } = conditionals[i];
+      const [pred, block] = conditionals[i];
       if (this.truthyValue(this.evaluate(pred, scope))) {
         this.evaluateBlock(block, scope);
       }
@@ -207,13 +208,26 @@ export class Interpreter {
         : createChildScope(scope);
       for (let i = 0; i < func.args.length; i += 1) {
         const arg = func.args[i];
-        if (arg.type === VARARG) {
-          childScope[arg.name] = argValues[i] || Null();
-        } else if (arg.type === BLOCKARG && this.notNull(lambda)) {
-          if (this.isNull(lambda.scope)) {
-            lambda.scope = scope;
-          }
-          childScope[arg.name] = lambda;
+        switch (arg.type) {
+          case VARARG:
+            childScope[arg.name] = argValues[i] || Null();
+            break;
+          case BLOCKARG:
+            if (this.isNull(lambda)) {
+              childScope[arg.name] = Null();
+              // FIXME ugly?
+              break;
+            }
+            if (this.isNull(lambda.scope)) {
+              lambda.scope = scope;
+            }
+            childScope[arg.name] = lambda;
+            break;
+          default:
+            throw new InterpreterError(
+              `Unknown variable type ${arg.type}`,
+              arg
+            );
         }
       }
       return this.evaluateBlock(func.body, childScope);
@@ -351,7 +365,7 @@ export class Interpreter {
 
   evaluateVariable(variable, scope) {
     const output = scope[variable.identifier];
-    if (!this.notNull(output)) {
+    if (output === undefined) {
       throw new InterpreterError(
         `Undefined Variable: ${variable.identifier}`,
         variable
