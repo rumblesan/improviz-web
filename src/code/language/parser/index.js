@@ -122,7 +122,7 @@ export class Parser extends VirgilParser {
       }
     }
     const t = this.peek();
-    this.errors.push(new UnexpectedTokenException(`Unexpected ${t.type}`, t));
+    this.errors.push(new UnexpectedTokenException(t.type, t));
     this.skipUntil(['newline']);
     this.clearNewlines();
   }
@@ -170,7 +170,7 @@ export class Parser extends VirgilParser {
       }
     }
     const t = this.peek();
-    this.errors.push(new UnexpectedTokenException(`Unexpected ${t.type}`, t));
+    this.errors.push(new UnexpectedTokenException(t.type, t));
     this.skipUntil(['newline']);
     this.clearNewlines();
   }
@@ -328,6 +328,7 @@ export class Parser extends VirgilParser {
         this.errors.push(e);
         this.resetStream('newline');
       }
+      this.clearNewlines();
       return ast.ConditionalAssignment(idToken.content, expr, position);
     }
 

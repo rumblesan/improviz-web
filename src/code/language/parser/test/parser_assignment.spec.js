@@ -6,6 +6,7 @@ import { Parser } from '../index';
 import {
   Program,
   Assignment,
+  ConditionalAssignment,
   BinaryOp,
   Num,
   UnaryOp,
@@ -71,13 +72,22 @@ describe('Assignment', function() {
     'brackets work correctly in expressions',
     parserTest(
       new Parser(),
-      'number = (456 + 33) * 2',
+      '\nnumber = (456 + 33) * 2\n',
       Program([
         Assignment(
           'number',
           BinaryOp('*', BinaryOp('+', Num(456), Num(33)), Num(2))
         ),
       ])
+    )
+  );
+
+  it(
+    'parses conditional assignments correctly',
+    parserTest(
+      new Parser(),
+      '\n\na := 12\n\n',
+      Program([ConditionalAssignment('a', Num(12))])
     )
   );
 });
