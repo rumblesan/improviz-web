@@ -35,10 +35,8 @@ export class StdLib {
     this.loadExternals(defaults, newScope);
     this.loadExternals(styleFunctions, newScope);
     this.loadExternals(transformationFunctions, newScope);
-    console.log(transformationFunctions);
     this.loadExternals(shapeFunctions, newScope);
 
-    console.log(newScope);
     return newScope;
   }
 
