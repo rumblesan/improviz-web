@@ -44,6 +44,14 @@ module.exports = {
         test: /\.ya?ml$/,
         loader: 'js-yaml-loader',
       },
+      {
+        test: /\.bmp$|\.png$/,
+        loader: 'file-loader',
+        include: [path.resolve(__dirname, 'src/textures')],
+        options: {
+          name: '[name].[ext]',
+        },
+      },
     ],
   },
   resolve: {

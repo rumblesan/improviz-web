@@ -54,3 +54,17 @@ styleFunctions:
           style(s)
           blk()
           popSnapshot()
+
+  - name: texture
+    code: |
+      func texture(name, &blk)
+        m = :material
+        if (isNull(blk))
+          style(m, :texture)
+          style(:texture, name)
+        else
+          pushSnapshot()
+          style(m, :texture)
+          style(:texture, name)
+          blk()
+          popSnapshot()

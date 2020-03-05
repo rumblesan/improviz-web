@@ -1,6 +1,7 @@
 import { projectionMatrix, lookAt, vec3, identityM44 } from './matrices';
 import { loadMaterial } from './shaders';
 import { loadGeometry, triangle, rectangle, cube } from './geometries';
+import { loadTexture } from './textures';
 import { multiplyM44 } from './matrices';
 
 import { Stack } from '../util/stack';
@@ -8,6 +9,12 @@ import { CrossFrameSetting } from '../util/cross-frame-setting';
 
 import { material as basicMaterial } from './materials/basic.yaml';
 import { material as weirdMaterial } from './materials/weird.yaml';
+import { material as textureMaterial } from './materials/texture.yaml';
+
+import algorave from '../../textures/algorave.png';
+import crystal from '../../textures/crystal.bmp';
+
+const exists = a => a !== null && a !== undefined;
 
 export class IGfx {
   constructor(canvasEl, context) {
@@ -29,6 +36,7 @@ export class IGfx {
     this.strokeStack = new Stack({ style: 'stroke', color: [0, 0, 0, 1] });
     this.strokeSizeStack = new Stack(0.02);
     this.materialStack = new Stack('basic');
+    this.textureStack = new Stack('crystal');
 
     this.background = new CrossFrameSetting([1, 1, 1]);
     this.depthCheck = new CrossFrameSetting(true);
@@ -42,6 +50,12 @@ export class IGfx {
     this.materials = {
       basic: loadMaterial(this.ctx, basicMaterial),
       weird: loadMaterial(this.ctx, weirdMaterial),
+      texture: loadMaterial(this.ctx, textureMaterial),
+    };
+
+    this.textures = {
+      algorave: loadTexture(this.ctx, algorave),
+      crystal: loadTexture(this.ctx, crystal),
     };
   }
 
@@ -50,6 +64,8 @@ export class IGfx {
     this.fillStack.pushSnapshot();
     this.strokeStack.pushSnapshot();
     this.strokeSizeStack.pushSnapshot();
+    this.materialStack.pushSnapshot();
+    this.textureStack.pushSnapshot();
   }
 
   popSnapshot() {
@@ -57,64 +73,101 @@ export class IGfx {
     this.fillStack.popSnapshot();
     this.strokeStack.popSnapshot();
     this.strokeSizeStack.popSnapshot();
+    this.materialStack.popSnapshot();
+    this.textureStack.pushSnapshot();
+  }
+
+  getFillColor() {
+    const fillStyle = this.fillStack.top();
+    return fillStyle.style === 'fill' ? fillStyle.color : [0, 0, 0, 0];
+  }
+
+  getStrokeColor(fallback) {
+    const strokeStyle = this.strokeStack.top();
+    return strokeStyle.style === 'stroke' ? strokeStyle.color : fallback;
+  }
+
+  getTexture() {
+    const name = this.textureStack.top();
+    const t = this.textures[name];
+    return exists(t) ? t : this.textures.crystal;
   }
 
   drawShape(name, sizeMatrix) {
     const gl = this.ctx;
-    const shape = this.geometries[name];
-    const fillStyle = this.fillStack.top();
-    const fillColor =
-      fillStyle.style === 'fill' ? fillStyle.color : [0, 0, 0, 0];
-    const strokeStyle = this.strokeStack.top();
-    const strokeColor =
-      strokeStyle.style === 'stroke' ? strokeStyle.color : fillColor;
-    const strokeSize = this.strokeSizeStack.top();
-    const mMatrix = multiplyM44(sizeMatrix, this.matrixStack.top());
 
     const materialName = this.materialStack.top();
     const material = this.materials[materialName];
     // FIXME raise an error?
     if (!material) return;
 
-    gl.useProgram(material.program);
+    // FIXME raise an error?
+    const shape = this.geometries[name];
+    if (!shape) return;
 
-    gl.uniformMatrix4fv(material.uniforms.Pmatrix, false, this.pMatrix);
-    gl.uniformMatrix4fv(material.uniforms.Vmatrix, false, this.vMatrix);
-    gl.uniformMatrix4fv(material.uniforms.Mmatrix, false, mMatrix);
-    gl.uniform4fv(material.uniforms.Color, fillColor);
-    gl.uniform4fv(material.uniforms.WireColor, strokeColor);
-    gl.uniform1f(material.uniforms.StrokeSize, strokeSize);
+    const { program, attributes, uniforms } = material;
+    const { buffers, geometry } = shape;
 
-    gl.enableVertexAttribArray(material.attributes.position);
-    gl.bindBuffer(gl.ARRAY_BUFFER, shape.buffers.vertex);
-    gl.vertexAttribPointer(
-      material.attributes.position,
-      3,
-      gl.FLOAT,
-      false,
-      0,
-      0
-    );
+    gl.useProgram(program);
 
-    gl.enableVertexAttribArray(material.attributes.barycentric);
-    gl.bindBuffer(gl.ARRAY_BUFFER, shape.buffers.wireframe);
-    gl.vertexAttribPointer(
-      material.attributes.barycentric,
-      3,
-      gl.FLOAT,
-      false,
-      0,
-      0
-    );
+    if (uniforms.Pmatrix !== null) {
+      gl.uniformMatrix4fv(uniforms.Pmatrix, false, this.pMatrix);
+    }
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.buffers.index);
+    if (uniforms.Vmatrix !== null) {
+      gl.uniformMatrix4fv(uniforms.Vmatrix, false, this.vMatrix);
+    }
 
-    //gl.bindVertexArray(shape.vao);
+    if (uniforms.Vmatrix !== null) {
+      const mMatrix = multiplyM44(sizeMatrix, this.matrixStack.top());
+      gl.uniformMatrix4fv(uniforms.Mmatrix, false, mMatrix);
+    }
+
+    let fillColor;
+    if (exists(uniforms.Color)) {
+      fillColor = this.getFillColor();
+      gl.uniform4fv(uniforms.Color, fillColor);
+    }
+    if (exists(uniforms.WireColor)) {
+      const strokeColor = this.getStrokeColor(fillColor);
+      gl.uniform4fv(uniforms.WireColor, strokeColor);
+    }
+    if (exists(uniforms.StrokeSize)) {
+      const strokeSize = this.strokeSizeStack.top();
+      gl.uniform1f(uniforms.StrokeSize, strokeSize);
+    }
+
+    if (exists(uniforms.Texture)) {
+      const texture = this.getTexture();
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.uniform1i(uniforms.Texture, 0);
+    }
+
+    if (exists(attributes.position) && exists(buffers.vertex)) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+      gl.vertexAttribPointer(attributes.position, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(attributes.position);
+    }
+
+    if (exists(attributes.barycentric) && exists(buffers.wireframe)) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.wireframe);
+      gl.vertexAttribPointer(attributes.barycentric, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(attributes.barycentric);
+    }
+
+    if (exists(attributes.textureCoord) && exists(buffers.texture)) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texture);
+      gl.vertexAttribPointer(attributes.textureCoord, 2, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(attributes.textureCoord);
+    }
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
 
     gl.cullFace(gl.FRONT);
     gl.drawElements(
       gl.TRIANGLES,
-      shape.geometry.indices.length,
+      geometry.indices.length,
       gl.UNSIGNED_SHORT,
       0
     );
@@ -122,7 +175,7 @@ export class IGfx {
     gl.cullFace(gl.BACK);
     gl.drawElements(
       gl.TRIANGLES,
-      shape.geometry.indices.length,
+      geometry.indices.length,
       gl.UNSIGNED_SHORT,
       0
     );
@@ -134,6 +187,10 @@ export class IGfx {
     this.matrixStack.reset();
     this.fillStack.reset();
     this.strokeStack.reset();
+    this.strokeSizeStack.reset();
+    this.materialStack.reset();
+    this.textureStack.reset();
+
     this.background.reset();
     this.depthCheck.reset();
 
