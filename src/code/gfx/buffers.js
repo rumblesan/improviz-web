@@ -19,7 +19,7 @@ export function createBuffers(gl, geometry) {
   gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
   gl.bufferData(
     gl.ARRAY_BUFFER,
-    new Uint16Array(geometry.texture),
+    new Float32Array(geometry.texture),
     gl.STATIC_DRAW
   );
 
