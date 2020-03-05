@@ -1,6 +1,7 @@
 import { projectionMatrix, lookAt, vec3, identityM44 } from './matrices';
 import { loadMaterial } from './shaders';
 import { loadGeometry, triangle, rectangle, cube } from './geometries';
+import { loadTexture } from './textures';
 import { multiplyM44 } from './matrices';
 
 import { Stack } from '../util/stack';
@@ -8,6 +9,8 @@ import { CrossFrameSetting } from '../util/cross-frame-setting';
 
 import { material as basicMaterial } from './materials/basic.yaml';
 import { material as weirdMaterial } from './materials/weird.yaml';
+
+import crystal from '../../textures/crystal.bmp';
 
 export class IGfx {
   constructor(canvasEl, context) {
@@ -43,6 +46,11 @@ export class IGfx {
       basic: loadMaterial(this.ctx, basicMaterial),
       weird: loadMaterial(this.ctx, weirdMaterial),
     };
+
+    this.textures = {
+      crystal: loadTexture(this.ctx, crystal),
+    };
+    console.log(this.textures);
   }
 
   pushSnapshot() {
