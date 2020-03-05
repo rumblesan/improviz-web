@@ -1,15 +1,14 @@
 import { GFXError } from './errors';
 
-export function loadMaterial(gl, surface) {
+export function loadMaterial(gl, material) {
   const program = compileShaderProgram(
     gl,
-    surface.vertexShader,
-    surface.fragmentShader
+    material.vertexShader,
+    material.fragmentShader
   );
 
   const attributeLocations = {};
-  surface.attributes.forEach(aName => {
-    console.log('attributes', aName);
+  material.attributes.forEach(aName => {
     const attrib = gl.getAttribLocation(program, aName);
     if (attrib === null) {
       // TODO include gl.getError info
@@ -19,7 +18,7 @@ export function loadMaterial(gl, surface) {
   });
 
   const uniformLocations = {};
-  surface.uniforms.forEach(uName => {
+  material.uniforms.forEach(uName => {
     const uniform = gl.getUniformLocation(program, uName);
     if (uniform === null) {
       // TODO include gl.getError info

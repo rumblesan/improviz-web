@@ -13,6 +13,8 @@ import { material as textureMaterial } from './materials/texture.yaml';
 
 import crystal from '../../textures/crystal.bmp';
 
+const exists = a => a !== null && a !== undefined;
+
 export class IGfx {
   constructor(canvasEl, context) {
     this.canvas = canvasEl;
@@ -33,6 +35,7 @@ export class IGfx {
     this.strokeStack = new Stack({ style: 'stroke', color: [0, 0, 0, 1] });
     this.strokeSizeStack = new Stack(0.02);
     this.materialStack = new Stack('basic');
+    this.textureStack = new Stack('crystal');
 
     this.background = new CrossFrameSetting([1, 1, 1]);
     this.depthCheck = new CrossFrameSetting(true);
@@ -78,82 +81,87 @@ export class IGfx {
     return strokeStyle.style === 'stroke' ? strokeStyle.color : fallback;
   }
 
-  setupMaterial(material, sizeMatrix) {
-    const gl = this.ctx;
-
-    gl.useProgram(material.program);
-
-    if (material.uniforms.Pmatrix) {
-      gl.uniformMatrix4fv(material.uniforms.Pmatrix, false, this.pMatrix);
-    }
-
-    if (material.uniforms.Vmatrix) {
-      gl.uniformMatrix4fv(material.uniforms.Vmatrix, false, this.vMatrix);
-    }
-
-    if (material.uniforms.Vmatrix) {
-      const mMatrix = multiplyM44(sizeMatrix, this.matrixStack.top());
-      gl.uniformMatrix4fv(material.uniforms.Mmatrix, false, mMatrix);
-    }
-
-    let fillColor;
-    if (material.uniforms.Color) {
-      fillColor = this.getFillColor();
-      gl.uniform4fv(material.uniforms.Color, fillColor);
-    }
-    if (material.uniforms.WireColor) {
-      const strokeColor = this.getStrokeColor(fillColor);
-      gl.uniform4fv(material.uniforms.WireColor, strokeColor);
-    }
-    if (material.uniforms.StrokeSize) {
-      const strokeSize = this.strokeSizeStack.top();
-      gl.uniform1f(material.uniforms.StrokeSize, strokeSize);
-    }
+  getTexture() {
+    const name = this.textureStack.top();
+    const t = this.textures[name];
+    return exists(t) ? t : this.textures.crystal;
   }
 
   drawShape(name, sizeMatrix) {
     const gl = this.ctx;
-
-    const shape = this.geometries[name];
-    if (!shape) return;
 
     const materialName = this.materialStack.top();
     const material = this.materials[materialName];
     // FIXME raise an error?
     if (!material) return;
 
-    this.setupMaterial(material, sizeMatrix);
+    // FIXME raise an error?
+    const shape = this.geometries[name];
+    if (!shape) return;
 
-    gl.enableVertexAttribArray(material.attributes.position);
-    gl.bindBuffer(gl.ARRAY_BUFFER, shape.buffers.vertex);
-    gl.vertexAttribPointer(
-      material.attributes.position,
-      3,
-      gl.FLOAT,
-      false,
-      0,
-      0
-    );
+    const { program, attributes, uniforms } = material;
+    const { buffers, geometry } = shape;
 
-    gl.enableVertexAttribArray(material.attributes.barycentric);
-    gl.bindBuffer(gl.ARRAY_BUFFER, shape.buffers.wireframe);
-    gl.vertexAttribPointer(
-      material.attributes.barycentric,
-      3,
-      gl.FLOAT,
-      false,
-      0,
-      0
-    );
+    gl.useProgram(program);
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.buffers.index);
+    if (uniforms.Pmatrix !== null) {
+      gl.uniformMatrix4fv(uniforms.Pmatrix, false, this.pMatrix);
+    }
 
-    //gl.bindVertexArray(shape.vao);
+    if (uniforms.Vmatrix !== null) {
+      gl.uniformMatrix4fv(uniforms.Vmatrix, false, this.vMatrix);
+    }
+
+    if (uniforms.Vmatrix !== null) {
+      const mMatrix = multiplyM44(sizeMatrix, this.matrixStack.top());
+      gl.uniformMatrix4fv(uniforms.Mmatrix, false, mMatrix);
+    }
+
+    let fillColor;
+    if (exists(uniforms.Color)) {
+      fillColor = this.getFillColor();
+      gl.uniform4fv(uniforms.Color, fillColor);
+    }
+    if (exists(uniforms.WireColor)) {
+      const strokeColor = this.getStrokeColor(fillColor);
+      gl.uniform4fv(uniforms.WireColor, strokeColor);
+    }
+    if (exists(uniforms.StrokeSize)) {
+      const strokeSize = this.strokeSizeStack.top();
+      gl.uniform1f(uniforms.StrokeSize, strokeSize);
+    }
+
+    if (exists(uniforms.Texture)) {
+      const texture = this.getTexture();
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.uniform1i(uniforms.Texture, 0);
+    }
+
+    if (exists(attributes.position) && exists(buffers.vertex)) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
+      gl.vertexAttribPointer(attributes.position, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(attributes.position);
+    }
+
+    if (exists(attributes.barycentric) && exists(buffers.wireframe)) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.wireframe);
+      gl.vertexAttribPointer(attributes.barycentric, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(attributes.barycentric);
+    }
+
+    if (exists(attributes.textureCoord) && exists(buffers.texture)) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texture);
+      gl.vertexAttribPointer(attributes.textureCoord, 2, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(attributes.textureCoord);
+    }
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
 
     gl.cullFace(gl.FRONT);
     gl.drawElements(
       gl.TRIANGLES,
-      shape.geometry.indices.length,
+      geometry.indices.length,
       gl.UNSIGNED_SHORT,
       0
     );
@@ -161,7 +169,7 @@ export class IGfx {
     gl.cullFace(gl.BACK);
     gl.drawElements(
       gl.TRIANGLES,
-      shape.geometry.indices.length,
+      geometry.indices.length,
       gl.UNSIGNED_SHORT,
       0
     );

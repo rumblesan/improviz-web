@@ -21,7 +21,10 @@ export const triangle = {
   barycentrics: [
     0, 0, 1,  0, 1, 0,  1, 0, 0,
   ],
-  texture: [0, 0, 1, 0, 1, 0, 1, 0, 0],
+  // prettier-ignore
+  texture: [
+    0, 0,  0, 1,  1, 0,
+  ]
 };
 
 export const rectangle = {
@@ -39,7 +42,7 @@ export const rectangle = {
   ],
   // prettier-ignore
   texture: [
-    0, 0, 1,  0, 1, 0,  1, 1, 0,  0, 1, 0,
+    0, 0,  0, 1,  1, 1,  1, 0,
   ]
 };
 
@@ -62,7 +65,7 @@ export const cube = {
   ],
   // prettier-ignore
   texture: [
-    0, 0, 1,  0, 1, 0,  1, 1, 0,  0, 1, 0,
-    1, 0, 1,  0, 0, 1,  0, 1, 0,  0, 0, 1,
+    0, 0,  0, 1,  1, 1,  0, 1,
+    1, 0,  0, 0,  0, 1,  0, 0,
   ]
 };

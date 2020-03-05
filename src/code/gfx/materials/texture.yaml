@@ -1,4 +1,5 @@
 material:
+  name: texture
   attributes:
     - position
     - textureCoord

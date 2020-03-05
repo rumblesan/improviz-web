@@ -1,4 +1,5 @@
 material:
+  name: basic
   attributes:
     - position
     - barycentric
