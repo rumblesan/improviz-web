@@ -1,0 +1,32 @@
+material:
+  attributes:
+    - position
+    - textureCoord
+  uniforms:
+    - Pmatrix
+    - Vmatrix
+    - Mmatrix
+    - Texture
+  vertexShader: |
+    attribute vec3 position;
+    attribute vec2 textureCoord;
+
+    uniform mat4 Pmatrix;
+    uniform mat4 Vmatrix;
+    uniform mat4 Mmatrix;
+
+    varying highp vec2 vTextureCoord;
+
+    void main(void) {
+      gl_Position = ((Pmatrix * Vmatrix) * Mmatrix) * vec4(position, 1.);
+      vTextureCoord = textureCoord;
+    }
+  fragmentShader: |
+    precision mediump float;
+
+    varying highp vec2 vTextureCoord;
+    uniform sampler2D Texture;
+
+    void main(void) {
+      gl_FragColor = texture2D(Texture, vTextureCoord);
+    }

@@ -9,6 +9,7 @@ import { CrossFrameSetting } from '../util/cross-frame-setting';
 
 import { material as basicMaterial } from './materials/basic.yaml';
 import { material as weirdMaterial } from './materials/weird.yaml';
+import { material as textureMaterial } from './materials/texture.yaml';
 
 import crystal from '../../textures/crystal.bmp';
 
@@ -45,12 +46,12 @@ export class IGfx {
     this.materials = {
       basic: loadMaterial(this.ctx, basicMaterial),
       weird: loadMaterial(this.ctx, weirdMaterial),
+      texture: loadMaterial(this.ctx, textureMaterial),
     };
 
     this.textures = {
       crystal: loadTexture(this.ctx, crystal),
     };
-    console.log(this.textures);
   }
 
   pushSnapshot() {
@@ -67,31 +68,61 @@ export class IGfx {
     this.strokeSizeStack.popSnapshot();
   }
 
+  getFillColor() {
+    const fillStyle = this.fillStack.top();
+    return fillStyle.style === 'fill' ? fillStyle.color : [0, 0, 0, 0];
+  }
+
+  getStrokeColor(fallback) {
+    const strokeStyle = this.strokeStack.top();
+    return strokeStyle.style === 'stroke' ? strokeStyle.color : fallback;
+  }
+
+  setupMaterial(material, sizeMatrix) {
+    const gl = this.ctx;
+
+    gl.useProgram(material.program);
+
+    if (material.uniforms.Pmatrix) {
+      gl.uniformMatrix4fv(material.uniforms.Pmatrix, false, this.pMatrix);
+    }
+
+    if (material.uniforms.Vmatrix) {
+      gl.uniformMatrix4fv(material.uniforms.Vmatrix, false, this.vMatrix);
+    }
+
+    if (material.uniforms.Vmatrix) {
+      const mMatrix = multiplyM44(sizeMatrix, this.matrixStack.top());
+      gl.uniformMatrix4fv(material.uniforms.Mmatrix, false, mMatrix);
+    }
+
+    let fillColor;
+    if (material.uniforms.Color) {
+      fillColor = this.getFillColor();
+      gl.uniform4fv(material.uniforms.Color, fillColor);
+    }
+    if (material.uniforms.WireColor) {
+      const strokeColor = this.getStrokeColor(fillColor);
+      gl.uniform4fv(material.uniforms.WireColor, strokeColor);
+    }
+    if (material.uniforms.StrokeSize) {
+      const strokeSize = this.strokeSizeStack.top();
+      gl.uniform1f(material.uniforms.StrokeSize, strokeSize);
+    }
+  }
+
   drawShape(name, sizeMatrix) {
     const gl = this.ctx;
+
     const shape = this.geometries[name];
-    const fillStyle = this.fillStack.top();
-    const fillColor =
-      fillStyle.style === 'fill' ? fillStyle.color : [0, 0, 0, 0];
-    const strokeStyle = this.strokeStack.top();
-    const strokeColor =
-      strokeStyle.style === 'stroke' ? strokeStyle.color : fillColor;
-    const strokeSize = this.strokeSizeStack.top();
-    const mMatrix = multiplyM44(sizeMatrix, this.matrixStack.top());
+    if (!shape) return;
 
     const materialName = this.materialStack.top();
     const material = this.materials[materialName];
     // FIXME raise an error?
     if (!material) return;
 
-    gl.useProgram(material.program);
-
-    gl.uniformMatrix4fv(material.uniforms.Pmatrix, false, this.pMatrix);
-    gl.uniformMatrix4fv(material.uniforms.Vmatrix, false, this.vMatrix);
-    gl.uniformMatrix4fv(material.uniforms.Mmatrix, false, mMatrix);
-    gl.uniform4fv(material.uniforms.Color, fillColor);
-    gl.uniform4fv(material.uniforms.WireColor, strokeColor);
-    gl.uniform1f(material.uniforms.StrokeSize, strokeSize);
+    this.setupMaterial(material, sizeMatrix);
 
     gl.enableVertexAttribArray(material.attributes.position);
     gl.bindBuffer(gl.ARRAY_BUFFER, shape.buffers.vertex);

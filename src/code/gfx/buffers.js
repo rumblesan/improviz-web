@@ -1,5 +1,4 @@
 export function createBuffers(gl, geometry) {
-  // Create and store data into vertex buffer
   const vertexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
   gl.bufferData(
@@ -8,7 +7,6 @@ export function createBuffers(gl, geometry) {
     gl.STATIC_DRAW
   );
 
-  // Create and store data into wireframe buffer
   const wireframeBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, wireframeBuffer);
   gl.bufferData(
@@ -17,7 +15,14 @@ export function createBuffers(gl, geometry) {
     gl.STATIC_DRAW
   );
 
-  // Create and store data into index buffer
+  const textureCoordBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordBuffer);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Uint16Array(geometry.texture),
+    gl.STATIC_DRAW
+  );
+
   const indexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
   gl.bufferData(
@@ -29,6 +34,7 @@ export function createBuffers(gl, geometry) {
   return {
     vertex: vertexBuffer,
     wireframe: wireframeBuffer,
+    texture: textureCoordBuffer,
     index: indexBuffer,
   };
 }
