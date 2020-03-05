@@ -64,6 +64,8 @@ export class IGfx {
     this.fillStack.pushSnapshot();
     this.strokeStack.pushSnapshot();
     this.strokeSizeStack.pushSnapshot();
+    this.materialStack.pushSnapshot();
+    this.textureStack.pushSnapshot();
   }
 
   popSnapshot() {
@@ -71,6 +73,8 @@ export class IGfx {
     this.fillStack.popSnapshot();
     this.strokeStack.popSnapshot();
     this.strokeSizeStack.popSnapshot();
+    this.materialStack.popSnapshot();
+    this.textureStack.pushSnapshot();
   }
 
   getFillColor() {
@@ -183,6 +187,10 @@ export class IGfx {
     this.matrixStack.reset();
     this.fillStack.reset();
     this.strokeStack.reset();
+    this.strokeSizeStack.reset();
+    this.materialStack.reset();
+    this.textureStack.reset();
+
     this.background.reset();
     this.depthCheck.reset();
 
