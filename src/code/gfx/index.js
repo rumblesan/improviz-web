@@ -11,6 +11,7 @@ import { material as basicMaterial } from './materials/basic.yaml';
 import { material as weirdMaterial } from './materials/weird.yaml';
 import { material as textureMaterial } from './materials/texture.yaml';
 
+import algorave from '../../textures/algorave.png';
 import crystal from '../../textures/crystal.bmp';
 
 const exists = a => a !== null && a !== undefined;
@@ -53,6 +54,7 @@ export class IGfx {
     };
 
     this.textures = {
+      algorave: loadTexture(this.ctx, algorave),
       crystal: loadTexture(this.ctx, crystal),
     };
   }

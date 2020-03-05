@@ -45,7 +45,7 @@ module.exports = {
         loader: 'js-yaml-loader',
       },
       {
-        test: /\.bmp$/,
+        test: /\.bmp$|\.png$/,
         loader: 'file-loader',
         include: [path.resolve(__dirname, 'src/textures')],
         options: {

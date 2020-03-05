@@ -24,6 +24,9 @@ export function style(args) {
     case 'material':
       material.call(this, args);
       break;
+    case 'texture':
+      texture.call(this, args);
+      break;
     default:
       throw new InterpreterError('Unknown style command', s);
   }
@@ -63,4 +66,10 @@ export function material(args) {
   let [name] = args;
   if (!isSymbol(name)) throw new InterpreterError('Expected Symbol', name);
   this.materialStack.push(name.value);
+}
+
+export function texture(args) {
+  let [name] = args;
+  if (!isSymbol(name)) throw new InterpreterError('Expected Symbol', name);
+  this.textureStack.push(name.value);
 }
