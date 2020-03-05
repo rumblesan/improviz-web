@@ -11,7 +11,7 @@ import * as templates from './templates';
 
 import { clickHandler } from './code/dom';
 import { getConfig } from './code/config';
-import { encodeProgram } from './code/encoder';
+import { encodeProgram } from './code/util/encoder';
 
 import { EventBus } from './code/event-bus';
 import { Popups } from './code/ui/popups';

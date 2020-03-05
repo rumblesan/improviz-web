@@ -1,4 +1,4 @@
-import { decodeProgram } from './encoder';
+import { decodeProgram } from './util/encoder';
 
 const defaultConfig = {
   keyMap: 'default',
