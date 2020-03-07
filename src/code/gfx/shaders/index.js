@@ -1,4 +1,4 @@
-import { GFXError } from './errors';
+import { GFXError } from '../errors';
 
 export function loadMaterial(gl, material) {
   const program = compileShaderProgram(
