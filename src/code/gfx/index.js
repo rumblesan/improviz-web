@@ -21,7 +21,7 @@ export class IGfx {
     this.canvas = canvasEl;
     this.canvas.width = canvasEl.clientWidth;
     this.canvas.height = canvasEl.clientHeight;
-    this.ctx = context;
+    this.gl = context;
 
     this.pMatrix = projectionMatrix(
       1,
@@ -42,20 +42,20 @@ export class IGfx {
     this.depthCheck = new CrossFrameSetting(true);
 
     this.geometries = {
-      triangle: loadGeometry(this.ctx, triangle),
-      cube: loadGeometry(this.ctx, cube),
-      rectangle: loadGeometry(this.ctx, rectangle),
+      triangle: loadGeometry(this.gl, triangle),
+      cube: loadGeometry(this.gl, cube),
+      rectangle: loadGeometry(this.gl, rectangle),
     };
 
     this.materials = {
-      basic: loadMaterial(this.ctx, basicMaterial),
-      weird: loadMaterial(this.ctx, weirdMaterial),
-      texture: loadMaterial(this.ctx, textureMaterial),
+      basic: loadMaterial(this.gl, basicMaterial),
+      weird: loadMaterial(this.gl, weirdMaterial),
+      texture: loadMaterial(this.gl, textureMaterial),
     };
 
     this.textures = {
-      algorave: loadTexture(this.ctx, algorave),
-      crystal: loadTexture(this.ctx, crystal),
+      algorave: loadTexture(this.gl, algorave),
+      crystal: loadTexture(this.gl, crystal),
     };
   }
 
@@ -94,7 +94,7 @@ export class IGfx {
   }
 
   drawShape(name, sizeMatrix) {
-    const gl = this.ctx;
+    const gl = this.gl;
 
     const materialName = this.materialStack.top();
     const material = this.materials[materialName];
@@ -182,7 +182,7 @@ export class IGfx {
   }
 
   reset() {
-    const gl = this.ctx;
+    const gl = this.gl;
 
     this.matrixStack.reset();
     this.fillStack.reset();
