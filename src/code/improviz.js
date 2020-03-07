@@ -83,12 +83,13 @@ export class Improviz {
     this.eventBus.on('evaluate', () => this.evaluate());
 
     const animate = time => {
-      this.gfx.reset();
+      this.gfx.begin();
       this.stdlib.setTime(time);
       const result = this.interpreter.run(
         this.currentProgram,
         this.stdlib.scope
       );
+      this.gfx.end();
       if (result.exitCode === 0) {
         this.workingCount += 1;
         if (this.workingCount === 10) {

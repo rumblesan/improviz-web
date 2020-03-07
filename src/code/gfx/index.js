@@ -181,7 +181,7 @@ export class IGfx {
     );
   }
 
-  reset() {
+  begin() {
     const gl = this.gl;
 
     this.matrixStack.reset();
@@ -213,4 +213,6 @@ export class IGfx {
     gl.viewport(0.0, 0.0, this.canvas.width, this.canvas.height);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
+
+  end() {}
 }
