@@ -3,7 +3,13 @@ import { makeFunc, makeNum } from '../ffi';
 import { style, strokeSize } from './style';
 import { shape } from './shapes';
 import { matrix } from './transforms';
-import { pushSnapshot, popSnapshot, background, depthOff } from './system';
+import {
+  pushSnapshot,
+  popSnapshot,
+  background,
+  depthOff,
+  animationStyle,
+} from './system';
 import { isNull } from './util';
 
 import { defaults } from '../../stdlib/defaults.yaml';
@@ -30,6 +36,10 @@ export class StdLib {
       background: makeFunc('background', background.bind(this.runtime)),
       depthOff: makeFunc('depthOff', depthOff.bind(this.runtime)),
       isNull: makeFunc('isNull', isNull.bind(this.runtime)),
+      animationStyle: makeFunc(
+        'animationStyle',
+        animationStyle.bind(this.runtime)
+      ),
     };
 
     this.loadExternals(defaults, newScope);

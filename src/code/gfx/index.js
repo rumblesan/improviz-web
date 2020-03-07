@@ -1,3 +1,4 @@
+import { PostProcessing } from './post-processing';
 import { projectionMatrix, lookAt, vec3, identityM44 } from './matrices';
 import { loadMaterial } from './shaders';
 import { loadGeometry, triangle, rectangle, cube } from './geometries';
@@ -40,6 +41,7 @@ export class IGfx {
 
     this.background = new CrossFrameSetting([1, 1, 1]);
     this.depthCheck = new CrossFrameSetting(true);
+    this.renderMode = new CrossFrameSetting('normal');
 
     this.geometries = {
       triangle: loadGeometry(this.gl, triangle),
@@ -57,6 +59,8 @@ export class IGfx {
       algorave: loadTexture(this.gl, algorave),
       crystal: loadTexture(this.gl, crystal),
     };
+
+    this.postProcessing = new PostProcessing(this.canvas, this.gl);
   }
 
   pushSnapshot() {
@@ -184,6 +188,8 @@ export class IGfx {
   begin() {
     const gl = this.gl;
 
+    this.postProcessing.use();
+
     this.matrixStack.reset();
     this.fillStack.reset();
     this.strokeStack.reset();
@@ -193,6 +199,7 @@ export class IGfx {
 
     this.background.reset();
     this.depthCheck.reset();
+    this.renderMode.reset();
 
     gl.frontFace(gl.CW);
     gl.enable(gl.CULL_FACE);
@@ -214,5 +221,8 @@ export class IGfx {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 
-  end() {}
+  end() {
+    const renderMode = this.renderMode.get();
+    this.postProcessing.render(renderMode);
+  }
 }
