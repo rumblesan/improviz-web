@@ -92,7 +92,6 @@ export class SavePass {
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.quad.index);
 
-    gl.drawArrays(gl.TRIANGLES, 0, this.quad.index.length);
     gl.drawElements(
       gl.TRIANGLES,
       this.quad.geometries.indices.length,

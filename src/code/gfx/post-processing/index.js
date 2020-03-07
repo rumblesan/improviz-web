@@ -30,15 +30,11 @@ export class PostProcessing {
   renderPaintOver() {
     const gl = this.gl;
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.blendedPass.framebuffer);
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
-    gl.clearColor(1, 1, 0, 1);
-
-    gl.clearDepth(1.0);
-
     gl.viewport(0.0, 0.0, this.canvas.width, this.canvas.height);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.blendedPass.framebuffer);
 
     this.paintOverPass.render(
       this.outputPass.textures.draw,
@@ -57,16 +53,6 @@ export class PostProcessing {
     const gl = this.gl;
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.outputPass.framebuffer);
-
-    gl.disable(gl.DEPTH_TEST);
-    gl.disable(gl.CULL_FACE);
-    gl.clearColor(1, 1, 0, 1);
-
-    gl.clearDepth(1.0);
-
-    gl.viewport(0.0, 0.0, this.canvas.width, this.canvas.height);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
     this.inputPass.render();
 
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.defaultFramebuffer);

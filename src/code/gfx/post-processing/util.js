@@ -1,7 +1,3 @@
-import { GFXError } from '../errors';
-import { compileShaderProgram } from '../shaders';
-import { savebuffer } from './shaders/savebuffer.yaml';
-
 export const quad = {
   // prettier-ignore
   vertices: [
@@ -66,11 +62,8 @@ export function create2DTexture(gl, width, height) {
     null
   );
 
-  // set the filtering so we don't need mips
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
   return tex;
 }
@@ -90,67 +83,9 @@ export function createDepthTexture(gl, width, height) {
     gl.UNSIGNED_INT,
     null
   );
+
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
   return tex;
-}
-
-export function createSavePass(gl, width, height) {
-  /* Create framebuffer used for drawing to the save pass texture */
-  const fb = gl.createFramebuffer();
-  gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-
-  const depthTexture = createDepthTexture(gl, width, height);
-  gl.framebufferTexture2D(
-    gl.FRAMEBUFFER,
-    gl.DEPTH_ATTACHMENT,
-    gl.TEXTURE_2D,
-    depthTexture,
-    0
-  );
-
-  const drawTexture = create2DTexture(gl, width, height);
-  gl.framebufferTexture2D(
-    gl.FRAMEBUFFER,
-    gl.COLOR_ATTACHMENT0,
-    gl.TEXTURE_2D,
-    drawTexture,
-    0
-  );
-
-  const renderQuad = createQuad(gl);
-
-  const program = compileShaderProgram(
-    gl,
-    savebuffer.vertexShader,
-    savebuffer.fragmentShader
-  );
-
-  const positionAttrib = gl.getAttribLocation(program, 'position');
-  if (positionAttrib === null)
-    throw new GFXError(`WebGL could not get position attribute location`);
-
-  const texcoordAttrib = gl.getAttribLocation(program, 'texcoord');
-  if (texcoordAttrib === null)
-    throw new GFXError(`WebGL could not get position attribute location`);
-
-  const textureUniform = gl.getUniformLocation(program, 'Texture');
-  if (textureUniform === null)
-    throw new GFXError(`WebGL could not get position attribute location`);
-
-  return {
-    quad: renderQuad,
-    program,
-    attributes: {
-      position: positionAttrib,
-      textureCoord: texcoordAttrib,
-    },
-    uniforms: {
-      Texture: textureUniform,
-    },
-    framebuffer: fb,
-    texture: drawTexture,
-    depth: depthTexture,
-  };
 }
