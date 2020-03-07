@@ -1,6 +1,5 @@
 import { PostProcessing } from './post-processing';
 import { projectionMatrix, lookAt, vec3, identityM44 } from './matrices';
-import { loadMaterial } from './shaders';
 import { loadGeometry, triangle, rectangle, cube } from './geometries';
 import { loadTexture } from './textures';
 import { multiplyM44 } from './matrices';
@@ -8,6 +7,7 @@ import { multiplyM44 } from './matrices';
 import { Stack } from '../util/stack';
 import { CrossFrameSetting } from '../util/cross-frame-setting';
 
+import { loadMaterial } from './materials';
 import { material as basicMaterial } from './materials/basic.yaml';
 import { material as weirdMaterial } from './materials/weird.yaml';
 import { material as textureMaterial } from './materials/texture.yaml';
