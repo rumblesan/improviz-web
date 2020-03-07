@@ -1,5 +1,5 @@
 import { InterpreterError } from '../interpreter/errors';
-import { isNum } from '../ffi';
+import { isNum, isSymbol } from '../ffi';
 
 export function pushSnapshot() {
   this.pushSnapshot();
@@ -19,4 +19,11 @@ export function background(args) {
 
 export function depthOff() {
   this.depthCheck.set(false);
+}
+
+export function animationStyle(args) {
+  let [animationStyle] = args;
+  if (!isSymbol(animationStyle))
+    throw new InterpreterError('Expected Symbol', animationStyle);
+  this.renderMode.set(animationStyle.value);
 }

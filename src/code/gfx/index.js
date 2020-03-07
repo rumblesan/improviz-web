@@ -41,6 +41,7 @@ export class IGfx {
 
     this.background = new CrossFrameSetting([1, 1, 1]);
     this.depthCheck = new CrossFrameSetting(true);
+    this.renderMode = new CrossFrameSetting('normal');
 
     this.geometries = {
       triangle: loadGeometry(this.gl, triangle),
@@ -187,7 +188,6 @@ export class IGfx {
   begin() {
     const gl = this.gl;
 
-    // placeholder sort of
     this.postProcessing.use();
 
     this.matrixStack.reset();
@@ -199,6 +199,7 @@ export class IGfx {
 
     this.background.reset();
     this.depthCheck.reset();
+    this.renderMode.reset();
 
     gl.frontFace(gl.CW);
     gl.enable(gl.CULL_FACE);
@@ -221,6 +222,7 @@ export class IGfx {
   }
 
   end() {
-    this.postProcessing.render(this.textures.algorave);
+    const renderMode = this.renderMode.get();
+    this.postProcessing.render(renderMode);
   }
 }

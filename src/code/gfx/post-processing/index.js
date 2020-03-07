@@ -1,57 +1,76 @@
-import { createSavePass } from './util';
+import { SavePass } from './save-pass';
+import { PaintOverPass } from './paintover-pass';
 
 export class PostProcessing {
   constructor(canvas, gl) {
     this.canvas = canvas;
     this.gl = gl;
     this.defaultFramebuffer = null;
-    this.savePass = createSavePass(gl, canvas.width, canvas.height);
+    this.inputPass = new SavePass(gl, canvas.width, canvas.height);
+    this.paintOverPass = new PaintOverPass(gl, canvas.width, canvas.height);
+    this.blendedPass = new SavePass(gl, canvas.width, canvas.height);
+    this.outputPass = new SavePass(gl, canvas.width, canvas.height);
   }
 
   use() {
-    const gl = this.gl;
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.savePass.framebuffer);
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.inputPass.framebuffer);
   }
 
-  render() {
+  render(mode) {
+    switch (mode) {
+      case 'paintover':
+        this.renderPaintOver();
+        break;
+      default:
+        this.renderNormal();
+        break;
+    }
+  }
+
+  renderPaintOver() {
     const gl = this.gl;
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.defaultFramebuffer);
-
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.blendedPass.framebuffer);
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
-    gl.clearColor(1, 0, 0, 1);
+    gl.clearColor(1, 1, 0, 1);
 
     gl.clearDepth(1.0);
 
     gl.viewport(0.0, 0.0, this.canvas.width, this.canvas.height);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    const { program, attributes, uniforms, quad, texture } = this.savePass;
-
-    gl.useProgram(program);
-
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.uniform1i(uniforms.Texture, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, quad.vertex);
-    gl.vertexAttribPointer(attributes.position, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(attributes.position);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, quad.texture);
-    gl.vertexAttribPointer(attributes.textureCoord, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(attributes.textureCoord);
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, quad.index);
-
-    gl.drawArrays(gl.TRIANGLES, 0, quad.index.length);
-    gl.drawElements(
-      gl.TRIANGLES,
-      quad.geometries.indices.length,
-      gl.UNSIGNED_SHORT,
-      0
+    this.paintOverPass.render(
+      this.outputPass.textures.draw,
+      this.inputPass.textures.draw,
+      this.inputPass.textures.depth
     );
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.outputPass.framebuffer);
+    this.blendedPass.render();
+
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.defaultFramebuffer);
+    this.outputPass.render();
+  }
+
+  renderNormal() {
+    const gl = this.gl;
+
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.outputPass.framebuffer);
+
+    gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.CULL_FACE);
+    gl.clearColor(1, 1, 0, 1);
+
+    gl.clearDepth(1.0);
+
+    gl.viewport(0.0, 0.0, this.canvas.width, this.canvas.height);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    this.inputPass.render();
+
+    this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.defaultFramebuffer);
+    this.outputPass.render();
   }
 
   skip() {
