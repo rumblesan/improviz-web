@@ -11,6 +11,7 @@ import { loadMaterial } from './materials';
 import { material as basicMaterial } from './materials/basic.yaml';
 import { material as weirdMaterial } from './materials/weird.yaml';
 import { material as textureMaterial } from './materials/texture.yaml';
+import { material as borderedMaterial } from './materials/bordered.yaml';
 
 import algorave from '../../textures/algorave.png';
 import crystal from '../../textures/crystal.bmp';
@@ -53,6 +54,7 @@ export class IGfx {
       basic: loadMaterial(this.gl, basicMaterial),
       weird: loadMaterial(this.gl, weirdMaterial),
       texture: loadMaterial(this.gl, textureMaterial),
+      bordered: loadMaterial(this.gl, borderedMaterial),
     };
 
     this.textures = {
