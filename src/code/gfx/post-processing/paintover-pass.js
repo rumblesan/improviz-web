@@ -9,12 +9,12 @@ export class PaintOverPass {
     this.gl = gl;
 
     const framebuffer = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, framebuffer);
     this.framebuffer = framebuffer;
 
     const depthTexture = createDepthTexture(gl, width, height);
     gl.framebufferTexture2D(
-      gl.FRAMEBUFFER,
+      gl.DRAW_FRAMEBUFFER,
       gl.DEPTH_ATTACHMENT,
       gl.TEXTURE_2D,
       depthTexture,
@@ -23,7 +23,7 @@ export class PaintOverPass {
 
     const drawTexture = create2DTexture(gl, width, height);
     gl.framebufferTexture2D(
-      gl.FRAMEBUFFER,
+      gl.DRAW_FRAMEBUFFER,
       gl.COLOR_ATTACHMENT0,
       gl.TEXTURE_2D,
       drawTexture,
