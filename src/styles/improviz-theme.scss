@@ -17,8 +17,7 @@ $cursor-color: #fff;
   }
 
   &.CodeMirror .CodeMirror-line > span {
-    background-color: solarized.$base03;
-    opacity: 80%;
+    background-color: rgba(solarized.$base03, 0.8);
   }
 
   .CodeMirror-line span span.CodeMirror-selectedtext {
@@ -41,6 +40,7 @@ $cursor-color: #fff;
   &.cm-fat-cursor .CodeMirror-cursor {
     background-color: rgba($cursor-color, 0.66);
     opacity: 80%;
+    border: 1px solid white;
   }
   /* Vim visual mode and selected text mode */
   .CodeMirror-line .cm-animate-fat-cursor {

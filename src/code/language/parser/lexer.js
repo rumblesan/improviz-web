@@ -15,8 +15,6 @@ const newline = {
 
 const comma = StandardTokenTypes.constant(',', 'comma');
 
-const period = StandardTokenTypes.constant('.', 'period');
-
 const colon = StandardTokenTypes.constant(':', 'colon');
 
 const lambdaArrow = StandardTokenTypes.constant('=>', 'lambda arrow');
@@ -33,13 +31,9 @@ const openBracket = StandardTokenTypes.constant('[', 'open bracket');
 
 const closeBracket = StandardTokenTypes.constant(']', 'close bracket');
 
-const openBrace = StandardTokenTypes.constant('{', 'open brace');
-
-const closeBrace = StandardTokenTypes.constant('}', 'close brace');
-
 const pipe = StandardTokenTypes.constant('|', 'pipe');
 
-const keywords = [
+export const keywords = [
   'if',
   'elif',
   'else',
@@ -73,7 +67,6 @@ export const tokenIdentifiers = {
   newline,
   comment,
   comma,
-  period,
   colon,
   lambdaArrow,
   assignment,
@@ -82,8 +75,6 @@ export const tokenIdentifiers = {
   closeParen,
   openBracket,
   closeBracket,
-  openBrace,
-  closeBrace,
   operator,
   number,
   identifier,
@@ -99,7 +90,6 @@ export function create() {
   lexer.addTokenType(operator);
 
   lexer.addTokenType(comma);
-  lexer.addTokenType(period);
   lexer.addTokenType(colon);
   lexer.addTokenType(pipe);
   lexer.addTokenType(lambdaArrow);
@@ -111,9 +101,6 @@ export function create() {
 
   lexer.addTokenType(openBracket);
   lexer.addTokenType(closeBracket);
-
-  lexer.addTokenType(openBrace);
-  lexer.addTokenType(closeBrace);
 
   lexer.addTokenType(number);
 
