@@ -185,6 +185,11 @@ export class IGfx {
     );
   }
 
+  init() {
+    this.begin();
+    this.end();
+  }
+
   begin() {
     const gl = this.gl;
 

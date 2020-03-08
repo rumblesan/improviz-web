@@ -78,6 +78,7 @@ export class Improviz {
   }
 
   start() {
+    this.gfx.init();
     this.evaluate();
 
     this.eventBus.on('evaluate', () => this.evaluate());
