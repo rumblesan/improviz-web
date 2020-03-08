@@ -1,42 +1,33 @@
 paintover:
   vertexShader: |
-    #version 300 es
+    attribute vec3 position;
+    attribute vec2 texcoord;
 
-    layout(location = 0) in vec3 position;
-    layout(location = 1) in vec2 texcoord;
-
-    out vec2 Texcoord;
+    varying vec2 Texcoord;
     void main()
     {
         Texcoord = texcoord;
         gl_Position = vec4(position, 1.0);
     }
   fragmentShader: |
-    #version 300 es
-
     precision mediump float;
-    in highp vec2 Texcoord;
+    varying highp vec2 Texcoord;
 
     uniform sampler2D newFrame;
     uniform sampler2D lastFrame;
     uniform sampler2D depth;
 
-    out vec4 outColor;
+    varying vec4 outColor;
 
-    void main()
-    {
-        float z = texture(depth, Texcoord).r;         // fetch the z-value from our depth texture
-        //float n = 0.1;                                // the near plane
-        //float f = 100.0;                              // the far plane
-        //float c = (2.0 * n) / (f + n - z * (f - n));  // convert to linear values
+    void main() {
+        float z = texture2D(depth, Texcoord).r;
 
-        vec4 texel1 = texture(newFrame, Texcoord);
-        vec4 texel2 = texture(lastFrame, Texcoord);
+        vec4 texel1 = texture2D(newFrame, Texcoord);
+        vec4 texel2 = texture2D(lastFrame, Texcoord);
 
         if (z < 1.0) {
-            outColor = texel1;
+            gl_FragColor = texel1;
         } else {
-            outColor = texel2;
+            gl_FragColor = texel2;
         }
-
     }

@@ -77,7 +77,7 @@ export function createDepthTexture(gl, width, height) {
   gl.texImage2D(
     gl.TEXTURE_2D,
     0,
-    gl.DEPTH_COMPONENT24,
+    gl.DEPTH_COMPONENT,
     width,
     height,
     0,

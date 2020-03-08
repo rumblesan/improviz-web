@@ -10,12 +10,12 @@ export class SavePass {
 
     /* Create framebuffer used for drawing to the save pass texture */
     const framebuffer = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, framebuffer);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
     this.framebuffer = framebuffer;
 
     const depthTexture = createDepthTexture(gl, width, height);
     gl.framebufferTexture2D(
-      gl.DRAW_FRAMEBUFFER,
+      gl.FRAMEBUFFER,
       gl.DEPTH_ATTACHMENT,
       gl.TEXTURE_2D,
       depthTexture,
@@ -24,7 +24,7 @@ export class SavePass {
 
     const drawTexture = create2DTexture(gl, width, height);
     gl.framebufferTexture2D(
-      gl.DRAW_FRAMEBUFFER,
+      gl.FRAMEBUFFER,
       gl.COLOR_ATTACHMENT0,
       gl.TEXTURE_2D,
       drawTexture,

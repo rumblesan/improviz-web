@@ -19,29 +19,42 @@ import { UI } from './code/ui';
 import { Improviz } from './code/improviz';
 import { IGfx } from './code/gfx';
 
-const canvas = document.getElementById('canvas');
+function start() {
+  const canvas = document.getElementById('canvas');
 
-const config = getConfig();
-const eventBus = new EventBus();
-const ui = new UI(eventBus);
-const popups = new Popups(document.querySelector('body'));
-eventBus.on('display-popup', popups.trigger.bind(popups));
-popups.register('error-popup', false, (message, error) => {
-  return templates.errorPopup({
-    message,
-    error,
+  const config = getConfig();
+  const eventBus = new EventBus();
+  const ui = new UI(eventBus);
+  const popups = new Popups(document.querySelector('body'));
+  eventBus.on('display-popup', popups.trigger.bind(popups));
+  popups.register('error-popup', false, (message, error) => {
+    return templates.errorPopup({
+      message,
+      error,
+    });
   });
-});
 
-const gl = canvas.getContext('webgl2');
-if (!gl) {
-  eventBus.emit(
-    'display-popup',
-    'error-popup',
-    'Sorry, there was an error starting up',
-    'Could not create WebGL context'
-  );
-} else {
+  const gl = canvas.getContext('webgl');
+  if (!gl) {
+    eventBus.emit(
+      'display-popup',
+      'error-popup',
+      'Sorry, there was an error starting up',
+      'Could not create WebGL context'
+    );
+    return;
+  }
+
+  const ext = gl.getExtension('WEBGL_depth_texture');
+  if (!ext) {
+    eventBus.emit(
+      'display-popup',
+      'error-popup',
+      'Sorry, there was an error starting up',
+      'Could not load WebGL Depth Texture extension'
+    );
+    return;
+  }
   const gfx = new IGfx(canvas, gl);
 
   const improviz = new Improviz(config, eventBus, CodeMirror, gfx);
@@ -107,3 +120,4 @@ if (!gl) {
 
   improviz.start();
 }
+start();
