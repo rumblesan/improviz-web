@@ -1,9 +1,14 @@
-/* global CodeMirror */
-
 import './index.html';
 import './favicon.ico';
 import './styles/main.scss';
-import './code/editor/improviz-mode';
+
+import CodeMirror from 'codemirror';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/keymap/vim';
+import 'codemirror/addon/lint/lint.js';
+import 'codemirror/addon/lint/lint.css';
+import defineImprovizMode from './code/editor/improviz-mode';
+defineImprovizMode(CodeMirror);
 
 import './code/polyfills';
 

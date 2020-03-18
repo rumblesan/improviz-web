@@ -48,6 +48,7 @@
   },
   "dependencies": {
     "@rumblesan/virgil": "0.0.7",
+    "codemirror": "^5.52.0",
     "dentist": "1.0.3"
   },
   "jest": {
