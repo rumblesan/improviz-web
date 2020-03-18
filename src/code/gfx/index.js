@@ -9,7 +9,7 @@ import { CrossFrameSetting } from '../util/cross-frame-setting';
 
 import { loadMaterial } from './materials';
 import { material as basicMaterial } from './materials/basic.yaml';
-import { material as weirdMaterial } from './materials/weird.yaml';
+//import { material as weirdMaterial } from './materials/weird.yaml';
 import { material as textureMaterial } from './materials/texture.yaml';
 import { material as borderedMaterial } from './materials/bordered.yaml';
 
@@ -52,7 +52,7 @@ export class IGfx {
 
     this.materials = {
       basic: loadMaterial(this.gl, basicMaterial),
-      weird: loadMaterial(this.gl, weirdMaterial),
+      //weird: loadMaterial(this.gl, weirdMaterial),
       texture: loadMaterial(this.gl, textureMaterial),
       bordered: loadMaterial(this.gl, borderedMaterial),
     };

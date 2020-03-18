@@ -7,7 +7,6 @@ material:
     - Pmatrix
     - Vmatrix
     - Mmatrix
-    - StrokeSize
   vertexShader: |
     attribute vec3 position;
     attribute vec3 barycentric;
@@ -15,21 +14,17 @@ material:
     uniform mat4 Pmatrix;
     uniform mat4 Vmatrix;
     uniform mat4 Mmatrix;
-    uniform float StrokeSize;
 
     varying vec3 vbc;
-    varying float vStrokeSize;
 
     void main(void) {
       gl_Position = ((Pmatrix * Vmatrix) * Mmatrix) * vec4(position, 1.);
       vbc = barycentric;
-      vStrokeSize = StrokeSize;
     }
   fragmentShader: |
     precision mediump float;
 
     varying vec3 vbc;
-    varying float vStrokeSize;
 
     void main(void) {
       gl_FragColor = vec4(vbc, 1.0);
