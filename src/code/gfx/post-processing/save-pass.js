@@ -41,6 +41,7 @@ export class SavePass {
 
     const program = compileShaderProgram(
       gl,
+      savebuffer.name,
       savebuffer.vertexShader,
       savebuffer.fragmentShader
     );

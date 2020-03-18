@@ -1,4 +1,4 @@
-import { GFXError } from '../errors';
+import { MaterialError } from '../errors';
 import { compileShaderProgram } from '../shaders';
 
 import { material as basic } from './basic.yaml';
@@ -28,6 +28,7 @@ export function loadAllMaterials(gl) {
 export function loadMaterial(gl, material) {
   const program = compileShaderProgram(
     gl,
+    material.name,
     material.vertexShader,
     material.fragmentShader
   );
@@ -37,8 +38,9 @@ export function loadMaterial(gl, material) {
     const attrib = gl.getAttribLocation(program, aName);
     if (attrib === null) {
       // TODO include gl.getError info
-      throw new GFXError(
-        `Error loading ${material.name} material: WebGL could not get ${aName} attribute.`
+      throw new MaterialError(
+        material.name,
+        `WebGL could not get ${aName} attribute.`
       );
     }
     attributeLocations[aName] = attrib;
@@ -49,8 +51,9 @@ export function loadMaterial(gl, material) {
     const uniform = gl.getUniformLocation(program, uName);
     if (uniform === null) {
       // TODO include gl.getError info
-      throw new GFXError(
-        `Error loading ${material.name} material: WebGL could not get ${uName} uniform.`
+      throw new MaterialError(
+        material.name,
+        `WebGL could not get ${uName} uniform.`
       );
     }
     uniformLocations[uName] = uniform;

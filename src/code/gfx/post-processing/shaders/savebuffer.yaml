@@ -1,4 +1,5 @@
 savebuffer:
+  name: savebuffer
   vertexShader: |
     attribute vec3 position;
     attribute vec2 texcoord;

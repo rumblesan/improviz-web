@@ -40,6 +40,7 @@ export class PaintOverPass {
 
     const program = compileShaderProgram(
       gl,
+      paintover.name,
       paintover.vertexShader,
       paintover.fragmentShader
     );
