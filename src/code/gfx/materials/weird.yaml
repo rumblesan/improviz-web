@@ -7,8 +7,6 @@ material:
     - Pmatrix
     - Vmatrix
     - Mmatrix
-    - Color
-    - WireColor
     - StrokeSize
   vertexShader: |
     attribute vec3 position;
@@ -17,34 +15,22 @@ material:
     uniform mat4 Pmatrix;
     uniform mat4 Vmatrix;
     uniform mat4 Mmatrix;
-    uniform vec4 Color;
-    uniform vec4 WireColor;
     uniform float StrokeSize;
 
-    varying vec4 vColor;
-    varying vec4 vWireColor;
     varying vec3 vbc;
     varying float vStrokeSize;
 
     void main(void) {
       gl_Position = ((Pmatrix * Vmatrix) * Mmatrix) * vec4(position, 1.);
-      vColor = Color;
-      vWireColor = WireColor;
       vbc = barycentric;
       vStrokeSize = StrokeSize;
     }
   fragmentShader: |
     precision mediump float;
 
-    varying vec4 vColor;
-    varying vec4 vWireColor;
     varying vec3 vbc;
     varying float vStrokeSize;
 
     void main(void) {
-      if(vbc.x < vStrokeSize || vbc.y < vStrokeSize || vbc.z < vStrokeSize) {
-        gl_FragColor = vWireColor;
-      } else {
-        gl_FragColor = 0.0 * vColor + vec4(vbc, 1.0);
-      }
+      gl_FragColor = vec4(vbc, 1.0);
     }

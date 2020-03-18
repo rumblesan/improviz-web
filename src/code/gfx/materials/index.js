@@ -13,7 +13,9 @@ export function loadMaterial(gl, material) {
     const attrib = gl.getAttribLocation(program, aName);
     if (attrib === null) {
       // TODO include gl.getError info
-      throw new GFXError(`WebGL could not get ${aName} attribute location`);
+      throw new GFXError(
+        `WebGL could not get ${aName} attribute location. Returned ${attrib}`
+      );
     }
     attributeLocations[aName] = attrib;
   });
@@ -23,7 +25,9 @@ export function loadMaterial(gl, material) {
     const uniform = gl.getUniformLocation(program, uName);
     if (uniform === null) {
       // TODO include gl.getError info
-      throw new GFXError(`WebGL could not get ${uName} uniform location`);
+      throw new GFXError(
+        `WebGL could not get ${uName} uniform location. Returned ${uniform}`
+      );
     }
     uniformLocations[uName] = uniform;
   });
