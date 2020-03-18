@@ -1,3 +1,26 @@
+import algorave from '../../textures/algorave.png';
+import crystal from '../../textures/crystal.bmp';
+
+export function loadAllTextures(gl) {
+  const errors = [];
+  const textures = {};
+
+  [algorave, crystal].forEach(texture => {
+    try {
+      const image = loadTexture(gl, texture);
+      const name = texture.split('.')[0];
+      textures[name] = image;
+    } catch (e) {
+      errors.push(e);
+    }
+  });
+
+  return {
+    errors,
+    textures,
+  };
+}
+
 export function loadTexture(gl, url) {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);

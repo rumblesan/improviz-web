@@ -1,6 +1,30 @@
 import { GFXError } from '../errors';
 import { compileShaderProgram } from '../shaders';
 
+import { material as basic } from './basic.yaml';
+//import { material as weird } from './weird.yaml';
+import { material as texture } from './texture.yaml';
+import { material as bordered } from './bordered.yaml';
+
+export function loadAllMaterials(gl) {
+  const errors = [];
+  const materials = {};
+
+  [basic, texture, bordered].forEach(m => {
+    try {
+      const loaded = loadMaterial(gl, m);
+      materials[loaded.name] = loaded;
+    } catch (e) {
+      errors.push(e);
+    }
+  });
+
+  return {
+    errors,
+    materials,
+  };
+}
+
 export function loadMaterial(gl, material) {
   const program = compileShaderProgram(
     gl,
@@ -26,13 +50,14 @@ export function loadMaterial(gl, material) {
     if (uniform === null) {
       // TODO include gl.getError info
       throw new GFXError(
-        `Error loading ${material.name} material: WebGL could not get ${uniform} uniform.`
+        `Error loading ${material.name} material: WebGL could not get ${uName} uniform.`
       );
     }
     uniformLocations[uName] = uniform;
   });
 
   return {
+    name: material.name,
     program,
     attributes: attributeLocations,
     uniforms: uniformLocations,

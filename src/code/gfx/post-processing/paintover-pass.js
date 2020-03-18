@@ -1,4 +1,4 @@
-import { GFXError } from '../errors';
+import { PostProcessingError } from '../errors';
 import { compileShaderProgram } from '../shaders';
 import { paintover } from './shaders/paintover.yaml';
 
@@ -47,11 +47,17 @@ export class PaintOverPass {
 
     const positionAttrib = gl.getAttribLocation(program, 'position');
     if (positionAttrib === null)
-      throw new GFXError(`WebGL could not get position attribute location`);
+      throw new PostProcessingError(
+        'PaintOver',
+        'WebGL could not get position attribute location'
+      );
 
     const texcoordAttrib = gl.getAttribLocation(program, 'texcoord');
     if (texcoordAttrib === null)
-      throw new GFXError(`WebGL could not get texcoord attribute location`);
+      throw new PostProcessingError(
+        'PaintOver',
+        'WebGL could not get texcoord attribute location'
+      );
     this.attributes = {
       position: positionAttrib,
       textureCoord: texcoordAttrib,
@@ -59,15 +65,24 @@ export class PaintOverPass {
 
     const newFrameUniform = gl.getUniformLocation(program, 'newFrame');
     if (newFrameUniform === null)
-      throw new GFXError(`WebGL could not get newFrame uniform location`);
+      throw new PostProcessingError(
+        'PaintOver',
+        'WebGL could not get newFrame uniform location'
+      );
 
     const lastFrameUniform = gl.getUniformLocation(program, 'lastFrame');
     if (lastFrameUniform === null)
-      throw new GFXError(`WebGL could not get lastFrame uniform location`);
+      throw new PostProcessingError(
+        'PaintOver',
+        'WebGL could not get lastFrame uniform location'
+      );
 
     const depthUniform = gl.getUniformLocation(program, 'depth');
     if (depthUniform === null)
-      throw new GFXError(`WebGL could not get depth uniform location`);
+      throw new PostProcessingError(
+        'PaintOver',
+        'WebGL could not get depth uniform location'
+      );
     this.uniforms = {
       LastFrame: lastFrameUniform,
       NewFrame: newFrameUniform,

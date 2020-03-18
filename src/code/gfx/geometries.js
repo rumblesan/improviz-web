@@ -1,5 +1,24 @@
 import { createBuffers } from './buffers';
 
+export function loadAllGeometries(gl) {
+  const errors = [];
+  const geometries = {};
+
+  [triangle, rectangle, cube].forEach(geo => {
+    try {
+      const loaded = loadGeometry(gl, geo);
+      geometries[geo.name] = loaded;
+    } catch (e) {
+      errors.push(e);
+    }
+  });
+
+  return {
+    errors,
+    geometries,
+  };
+}
+
 export function loadGeometry(gl, geometry) {
   const buffers = createBuffers(gl, geometry);
   return {
@@ -9,6 +28,7 @@ export function loadGeometry(gl, geometry) {
 }
 
 export const triangle = {
+  name: 'triangle',
   // prettier-ignore
   vertices: [
     0, 0.5, 0,  0.5,-0.5, 0,  -0.5,-0.5, 0,
@@ -28,6 +48,7 @@ export const triangle = {
 };
 
 export const rectangle = {
+  name: 'rectangle',
   // prettier-ignore
   vertices: [
     -0.5, -0.5, 0,  0.5, -0.5, 0,  0.5, 0.5, 0,  -0.5, 0.5, 0,
@@ -47,6 +68,7 @@ export const rectangle = {
 };
 
 export const cube = {
+  name: 'cube',
   // prettier-ignore
   vertices: [
     -0.5,-0.5,-0.5,  0.5,-0.5,-0.5,  0.5, 0.5,-0.5,  -0.5, 0.5,-0.5,

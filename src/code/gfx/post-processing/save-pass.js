@@ -1,4 +1,4 @@
-import { GFXError } from '../errors';
+import { PostProcessingError } from '../errors';
 import { compileShaderProgram } from '../shaders';
 import { savebuffer } from './shaders/savebuffer.yaml';
 
@@ -48,11 +48,17 @@ export class SavePass {
 
     const positionAttrib = gl.getAttribLocation(program, 'position');
     if (positionAttrib === null)
-      throw new GFXError(`WebGL could not get position attribute location`);
+      throw new PostProcessingError(
+        'Save',
+        `WebGL could not get position attribute location`
+      );
 
     const texcoordAttrib = gl.getAttribLocation(program, 'texcoord');
     if (texcoordAttrib === null)
-      throw new GFXError(`WebGL could not get position attribute location`);
+      throw new PostProcessingError(
+        'Save',
+        `WebGL could not get position attribute location`
+      );
     this.attributes = {
       position: positionAttrib,
       textureCoord: texcoordAttrib,
@@ -60,7 +66,10 @@ export class SavePass {
 
     const textureUniform = gl.getUniformLocation(program, 'Texture');
     if (textureUniform === null)
-      throw new GFXError(`WebGL could not get position attribute location`);
+      throw new PostProcessingError(
+        'Save',
+        `WebGL could not get position attribute location`
+      );
     this.uniforms = {
       Texture: textureUniform,
     };

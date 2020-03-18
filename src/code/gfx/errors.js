@@ -3,3 +3,9 @@ export class GFXError extends Error {
     super(message);
   }
 }
+
+export class PostProcessingError extends GFXError {
+  constructor(stage, message) {
+    super(`PostProcessing Error - ${stage}: ${message}`);
+  }
+}

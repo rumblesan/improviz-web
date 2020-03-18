@@ -1,20 +1,12 @@
 import { PostProcessing } from './post-processing';
 import { projectionMatrix, lookAt, vec3, identityM44 } from './matrices';
-import { loadGeometry, triangle, rectangle, cube } from './geometries';
-import { loadTexture } from './textures';
+import { loadAllGeometries } from './geometries';
+import { loadAllTextures } from './textures';
+import { loadAllMaterials } from './materials';
 import { multiplyM44 } from './matrices';
 
 import { Stack } from '../util/stack';
 import { CrossFrameSetting } from '../util/cross-frame-setting';
-
-import { loadMaterial } from './materials';
-import { material as basicMaterial } from './materials/basic.yaml';
-//import { material as weirdMaterial } from './materials/weird.yaml';
-import { material as textureMaterial } from './materials/texture.yaml';
-import { material as borderedMaterial } from './materials/bordered.yaml';
-
-import algorave from '../../textures/algorave.png';
-import crystal from '../../textures/crystal.bmp';
 
 const exists = a => a !== null && a !== undefined;
 
@@ -44,23 +36,17 @@ export class IGfx {
     this.depthCheck = new CrossFrameSetting(true);
     this.renderMode = new CrossFrameSetting('normal');
 
-    this.geometries = {
-      triangle: loadGeometry(this.gl, triangle),
-      cube: loadGeometry(this.gl, cube),
-      rectangle: loadGeometry(this.gl, rectangle),
-    };
+    const loadedGeometries = loadAllGeometries(this.gl);
+    loadedGeometries.errors.forEach(e => console.log(e));
+    this.geometries = loadedGeometries.geometries;
 
-    this.materials = {
-      basic: loadMaterial(this.gl, basicMaterial),
-      //weird: loadMaterial(this.gl, weirdMaterial),
-      texture: loadMaterial(this.gl, textureMaterial),
-      bordered: loadMaterial(this.gl, borderedMaterial),
-    };
+    const loadedMaterials = loadAllMaterials(this.gl);
+    loadedMaterials.errors.forEach(e => console.log(e));
+    this.materials = loadedMaterials.materials;
 
-    this.textures = {
-      algorave: loadTexture(this.gl, algorave),
-      crystal: loadTexture(this.gl, crystal),
-    };
+    const loadedTextures = loadAllTextures(this.gl);
+    loadedTextures.errors.forEach(e => console.log(e));
+    this.textures = loadedTextures.textures;
 
     this.postProcessing = new PostProcessing(this.canvas, this.gl);
   }
