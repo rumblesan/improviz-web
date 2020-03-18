@@ -14,7 +14,7 @@ export function loadMaterial(gl, material) {
     if (attrib === null) {
       // TODO include gl.getError info
       throw new GFXError(
-        `WebGL could not get ${aName} attribute location. Returned ${attrib}`
+        `Error loading ${material.name} material: WebGL could not get ${aName} attribute.`
       );
     }
     attributeLocations[aName] = attrib;
@@ -26,7 +26,7 @@ export function loadMaterial(gl, material) {
     if (uniform === null) {
       // TODO include gl.getError info
       throw new GFXError(
-        `WebGL could not get ${uName} uniform location. Returned ${uniform}`
+        `Error loading ${material.name} material: WebGL could not get ${uniform} uniform.`
       );
     }
     uniformLocations[uName] = uniform;
