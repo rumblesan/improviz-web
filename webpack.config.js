@@ -52,6 +52,10 @@ module.exports = {
           name: '[name].[ext]',
         },
       },
+      {
+        test: /\.obj$/,
+        use: 'raw-loader',
+      },
     ],
   },
   resolve: {

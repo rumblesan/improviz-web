@@ -3,7 +3,7 @@ shapeFunctions:
     code: |
       func triangle(x, y)
         x := 1
-        y := x*0.866
+        y := x
         shape(:triangle, x, y, 1)
 
   - name: cube
