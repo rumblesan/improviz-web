@@ -1,3 +1,10 @@
+export class InvalidProgramError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'InvalidProgramError';
+  }
+}
+
 export class InterpreterError extends Error {
   constructor(message, node) {
     super(message);

@@ -23,7 +23,7 @@ import {
 
 import { Lambda, Num, Null } from '../ast';
 
-import { InterpreterError } from './errors';
+import { InterpreterError, InvalidProgramError } from './errors';
 
 function createChildScope(parentScope) {
   return Object.create(parentScope);
@@ -36,7 +36,8 @@ export class Interpreter {
       exitCode: 0,
     };
 
-    if (ast.type !== PROGRAM) {
+    if (!ast || ast.type !== PROGRAM) {
+      state.errors.push(new InvalidProgramError('Invalid Program'));
       state.exitCode = 1;
       return state;
     }

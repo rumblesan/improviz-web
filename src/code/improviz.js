@@ -1,4 +1,5 @@
 import { Parser, Interpreter, StdLib } from './language';
+import { Program } from './language/ast';
 
 export class Improviz {
   constructor(config, eventBus, CodeMirror, gfx) {
@@ -7,9 +8,9 @@ export class Improviz {
     this.parser = new Parser();
     this.interpreter = new Interpreter();
     this.stdlib = new StdLib(gfx, this.parser, this.interpreter);
-    this.lastWorkingProgram = null;
+    this.lastWorkingProgram = Program([]);
     this.workingCount = 0;
-    this.currentProgram = null;
+    this.currentProgram = Program([]);
     this.runtimeErrors = [];
 
     this.editor = CodeMirror(
