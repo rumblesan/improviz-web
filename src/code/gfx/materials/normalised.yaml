@@ -1,0 +1,32 @@
+material:
+  name: normalised
+  attributes:
+    - position
+    - normals
+  uniforms:
+    - Pmatrix
+    - Vmatrix
+    - Mmatrix
+  vertexShader: |
+    attribute vec3 position;
+    attribute vec3 normals;
+
+    uniform mat4 Pmatrix;
+    uniform mat4 Vmatrix;
+    uniform mat4 Mmatrix;
+
+    varying vec3 vNormal;
+
+    void main(void) {
+      mat4 mvp = (Pmatrix * Vmatrix) * Mmatrix;
+      gl_Position = mvp * vec4(position, 1.);
+      vNormal = (mvp * vec4(normals, 1)).xyz;
+    }
+  fragmentShader: |
+    precision mediump float;
+
+    varying vec3 vNormal;
+
+    void main(void) {
+      gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, 1.0 );
+    }

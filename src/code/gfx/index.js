@@ -142,6 +142,12 @@ export class IGfx {
       gl.enableVertexAttribArray(attributes.position);
     }
 
+    if (exists(attributes.normals) && exists(buffers.normals)) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normals);
+      gl.vertexAttribPointer(attributes.normals, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(attributes.normals);
+    }
+
     if (exists(attributes.barycentric) && exists(buffers.wireframe)) {
       gl.bindBuffer(gl.ARRAY_BUFFER, buffers.wireframe);
       gl.vertexAttribPointer(attributes.barycentric, 3, gl.FLOAT, false, 0, 0);

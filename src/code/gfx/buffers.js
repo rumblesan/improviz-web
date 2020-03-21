@@ -23,6 +23,14 @@ export function createBuffers(gl, geometry) {
     gl.STATIC_DRAW
   );
 
+  const normalsBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, normalsBuffer);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array(geometry.normals),
+    gl.STATIC_DRAW
+  );
+
   const indexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
   gl.bufferData(
@@ -35,6 +43,7 @@ export function createBuffers(gl, geometry) {
     vertex: vertexBuffer,
     wireframe: wireframeBuffer,
     texture: textureCoordBuffer,
+    normals: normalsBuffer,
     index: indexBuffer,
   };
 }

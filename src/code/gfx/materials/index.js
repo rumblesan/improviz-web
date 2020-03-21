@@ -5,12 +5,13 @@ import { material as basic } from './basic.yaml';
 import { material as weird } from './weird.yaml';
 import { material as texture } from './texture.yaml';
 import { material as bordered } from './bordered.yaml';
+import { material as normalised } from './normalised.yaml';
 
 export function loadAllMaterials(gl) {
   const errors = [];
   const materials = {};
 
-  [basic, weird, texture, bordered].forEach(m => {
+  [basic, weird, texture, bordered, normalised].forEach(m => {
     try {
       const loaded = loadMaterial(gl, m);
       materials[loaded.name] = loaded;
