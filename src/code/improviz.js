@@ -86,7 +86,8 @@ export class Improviz {
 
     const animate = time => {
       this.gfx.begin();
-      this.stdlib.setTime(time);
+      // set time as seconds
+      this.stdlib.setTime(time / 1000);
       const result = this.interpreter.run(
         this.currentProgram,
         this.stdlib.scope
