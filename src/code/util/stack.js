@@ -10,7 +10,7 @@ export class Stack {
   }
   pushMod(v, mod) {
     const top = this.top();
-    this.push(mod(v, top));
+    this.push(mod(top, v));
   }
   top() {
     return this.stack[this.position];

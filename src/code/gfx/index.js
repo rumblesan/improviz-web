@@ -111,7 +111,7 @@ export class IGfx {
     }
 
     if (uniforms.Mmatrix !== null) {
-      const mMatrix = multiplyM44(sizeMatrix, this.matrixStack.top());
+      const mMatrix = multiplyM44(this.matrixStack.top(), sizeMatrix);
       gl.uniformMatrix4fv(uniforms.Mmatrix, false, mMatrix);
     }
 
