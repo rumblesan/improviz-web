@@ -110,7 +110,7 @@ export class IGfx {
       gl.uniformMatrix4fv(uniforms.Vmatrix, false, this.vMatrix);
     }
 
-    if (uniforms.Vmatrix !== null) {
+    if (uniforms.Mmatrix !== null) {
       const mMatrix = multiplyM44(sizeMatrix, this.matrixStack.top());
       gl.uniformMatrix4fv(uniforms.Mmatrix, false, mMatrix);
     }
