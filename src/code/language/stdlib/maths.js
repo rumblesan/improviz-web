@@ -2,6 +2,8 @@ import { makeNum } from '../ffi';
 import { InterpreterError } from '../interpreter/errors';
 import { isNum } from '../ffi';
 
+const TORAD = Math.PI / 180;
+
 export function sin(args) {
   const angle = args[0];
   if (!isNum(angle))
@@ -9,7 +11,7 @@ export function sin(args) {
       `Expected Number but found ${angle.type}`,
       angle
     );
-  return makeNum(Math.sin(angle.value));
+  return makeNum(Math.sin(angle.value * TORAD));
 }
 
 export function cos(args) {
@@ -19,7 +21,7 @@ export function cos(args) {
       `Expected Number but found ${angle.type}`,
       angle
     );
-  return makeNum(Math.cos(angle.value));
+  return makeNum(Math.cos(angle.value * TORAD));
 }
 
 export function tan(args) {
@@ -29,7 +31,7 @@ export function tan(args) {
       `Expected Number but found ${angle.type}`,
       angle
     );
-  return makeNum(Math.tan(angle.value));
+  return makeNum(Math.tan(angle.value * TORAD));
 }
 
 export function abs(args) {

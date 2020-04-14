@@ -140,11 +140,12 @@ export function multiplyM44(a, b) {
 }
 
 export function rotationXM44(angle) {
+  const rads = angle * TORAD;
   // prettier-ignore
   return [
     1, 0,          0,           0,
-    0, cos(angle), -sin(angle), 0,
-    0, sin(angle), cos(angle),  0,
+    0, cos(rads), -sin(rads), 0,
+    0, sin(rads), cos(rads),  0,
     0, 0,          0,           1,
   ];
 }
@@ -161,10 +162,11 @@ export function rotationYM44(angle) {
 }
 
 export function rotationZM44(angle) {
+  const rads = angle * TORAD;
   // prettier-ignore
   return [
-    cos(angle), -sin(angle), 0, 0,
-    sin(angle), cos(angle),  0, 0,
+    cos(rads), -sin(rads), 0, 0,
+    sin(rads), cos(rads),  0, 0,
     0, 0,          1,           0,
     0, 0,          0,           1,
   ];
