@@ -39,7 +39,7 @@ function start() {
     });
   });
 
-  const gl = canvas.getContext('webgl');
+  const gl = canvas.getContext('webgl2');
   if (!gl) {
     eventBus.emit(
       'display-popup',
@@ -50,6 +50,7 @@ function start() {
     return;
   }
 
+  /*
   const ext = gl.getExtension('WEBGL_depth_texture');
   if (!ext) {
     eventBus.emit(
@@ -60,6 +61,7 @@ function start() {
     );
     return;
   }
+  */
   const gfx = new IGfx(canvas, gl);
 
   const improviz = new Improviz(config, eventBus, CodeMirror, gfx);
