@@ -103,16 +103,16 @@ export class IGfx {
     gl.useProgram(program);
 
     if (uniforms.Pmatrix !== null) {
-      gl.uniformMatrix4fv(uniforms.Pmatrix, false, this.pMatrix);
+      gl.uniformMatrix4fv(uniforms.Pmatrix, true, this.pMatrix);
     }
 
     if (uniforms.Vmatrix !== null) {
-      gl.uniformMatrix4fv(uniforms.Vmatrix, false, this.vMatrix);
+      gl.uniformMatrix4fv(uniforms.Vmatrix, true, this.vMatrix);
     }
 
     if (uniforms.Mmatrix !== null) {
       const mMatrix = multiplyM44(this.matrixStack.top(), sizeMatrix);
-      gl.uniformMatrix4fv(uniforms.Mmatrix, false, mMatrix);
+      gl.uniformMatrix4fv(uniforms.Mmatrix, true, mMatrix);
     }
 
     let fillColor;
