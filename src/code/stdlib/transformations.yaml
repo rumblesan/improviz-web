@@ -2,7 +2,7 @@ transformationFunctions:
   - name: rotate
     code: |
       func rotate(x, y, z, &blk)
-        x := ((bpm/60) * (time + nudge) / 4 * pi)
+        x := ((bpm/60) * ((time/100) + nudge))
         y := x
         z := 0
         m = :rotate
@@ -17,7 +17,7 @@ transformationFunctions:
   - name: scale
     code: |
       func scale(x, y, z, &blk)
-        x := cos((bpm/60)*(time + nudge))
+        x := cos((bpm/60)*((time/100) + nudge))
         y := x
         z := y
         m = :scale
@@ -33,7 +33,7 @@ transformationFunctions:
     code: |
       func move(x, y, z, &blk)
         if (isNull(x))
-          b = 2 * pi * (bpm/60) * (time + nudge)
+          b = (bpm/60) * ((time/100) + nudge)
           x = cos(b)
           y = sin(b)
           z = cos(b)
