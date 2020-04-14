@@ -3,7 +3,6 @@ import { projectionMatrix, lookAt, vec3, identityM44 } from './matrices';
 import { loadAllGeometries } from './geometries';
 import { loadAllTextures } from './textures';
 import { loadAllMaterials } from './materials';
-import { multiplyM44 } from './matrices';
 
 import { Stack } from '../util/stack';
 import { CrossFrameSetting } from '../util/cross-frame-setting';
@@ -85,7 +84,65 @@ export class IGfx {
     return exists(t) ? t : this.textures.crystal;
   }
 
-  drawShape(name, sizeMatrix) {
+  setUniform(name, location) {
+    switch (name) {
+      case 'Pmatrix':
+        // transpose is true because our matrices are flat arrays in row-major format
+        this.gl.uniformMatrix4fv(location, true, this.pMatrix);
+        break;
+      case 'Vmatrix':
+        // transpose is true because our matrices are flat arrays in row-major format
+        this.gl.uniformMatrix4fv(location, true, this.vMatrix);
+        break;
+      case 'Mmatrix':
+        // transpose is true because our matrices are flat arrays in row-major format
+        this.gl.uniformMatrix4fv(location, true, this.matrixStack.top());
+        break;
+      case 'Color':
+        this.gl.uniform4fv(location, this.getFillColor());
+        break;
+      case 'WireColor':
+        this.gl.uniform4fv(location, this.getStrokeColor(this.getFillColor()));
+        break;
+      case 'StrokeSize':
+        this.gl.uniform1f(location, this.strokeSizeStack.top());
+        break;
+      case 'Texture':
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.getTexture());
+        this.gl.uniform1i(location, 0);
+        break;
+      default:
+        console.log(`${name} is an unknown uniform location`);
+    }
+  }
+
+  setAttribute(name, attrib, buffers) {
+    switch (name) {
+      case 'position':
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.vertex);
+        this.gl.vertexAttribPointer(attrib, 3, this.gl.FLOAT, false, 0, 0);
+        this.gl.enableVertexAttribArray(attrib);
+        break;
+      case 'normals':
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.normals);
+        this.gl.vertexAttribPointer(attrib, 3, this.gl.FLOAT, false, 0, 0);
+        this.gl.enableVertexAttribArray(attrib);
+        break;
+      case 'barycentric':
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.wireframe);
+        this.gl.vertexAttribPointer(attrib, 3, this.gl.FLOAT, false, 0, 0);
+        this.gl.enableVertexAttribArray(attrib);
+        break;
+      case 'textureCoord':
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, buffers.texture);
+        this.gl.vertexAttribPointer(attrib, 2, this.gl.FLOAT, false, 0, 0);
+        this.gl.enableVertexAttribArray(attrib);
+        break;
+    }
+  }
+
+  drawShape(name) {
     const gl = this.gl;
 
     const materialName = this.materialStack.top();
@@ -97,78 +154,22 @@ export class IGfx {
     const shape = this.geometries[name];
     if (!shape) return;
 
-    const { program, attributes, uniforms } = material;
-    const { buffers, geometry } = shape;
+    gl.useProgram(material.program);
 
-    gl.useProgram(program);
+    Object.entries(material.uniforms).forEach(([name, location]) =>
+      this.setUniform(name, location)
+    );
 
-    if (uniforms.Pmatrix !== null) {
-      // transpose is true because our matrices are flat arrays in row-major format
-      gl.uniformMatrix4fv(uniforms.Pmatrix, true, this.pMatrix);
-    }
+    Object.entries(material.attributes).forEach(([name, location]) =>
+      this.setAttribute(name, location, shape.buffers)
+    );
 
-    if (uniforms.Vmatrix !== null) {
-      // transpose is true because our matrices are flat arrays in row-major format
-      gl.uniformMatrix4fv(uniforms.Vmatrix, true, this.vMatrix);
-    }
-
-    if (uniforms.Mmatrix !== null) {
-      const mMatrix = multiplyM44(this.matrixStack.top(), sizeMatrix);
-      // transpose is true because our matrices are flat arrays in row-major format
-      gl.uniformMatrix4fv(uniforms.Mmatrix, true, mMatrix);
-    }
-
-    let fillColor;
-    if (exists(uniforms.Color)) {
-      fillColor = this.getFillColor();
-      gl.uniform4fv(uniforms.Color, fillColor);
-    }
-    if (exists(uniforms.WireColor)) {
-      const strokeColor = this.getStrokeColor(fillColor);
-      gl.uniform4fv(uniforms.WireColor, strokeColor);
-    }
-    if (exists(uniforms.StrokeSize)) {
-      const strokeSize = this.strokeSizeStack.top();
-      gl.uniform1f(uniforms.StrokeSize, strokeSize);
-    }
-
-    if (exists(uniforms.Texture)) {
-      const texture = this.getTexture();
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.uniform1i(uniforms.Texture, 0);
-    }
-
-    if (exists(attributes.position) && exists(buffers.vertex)) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertex);
-      gl.vertexAttribPointer(attributes.position, 3, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(attributes.position);
-    }
-
-    if (exists(attributes.normals) && exists(buffers.normals)) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.normals);
-      gl.vertexAttribPointer(attributes.normals, 3, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(attributes.normals);
-    }
-
-    if (exists(attributes.barycentric) && exists(buffers.wireframe)) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.wireframe);
-      gl.vertexAttribPointer(attributes.barycentric, 3, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(attributes.barycentric);
-    }
-
-    if (exists(attributes.textureCoord) && exists(buffers.texture)) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texture);
-      gl.vertexAttribPointer(attributes.textureCoord, 2, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(attributes.textureCoord);
-    }
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.index);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, shape.buffers.index);
 
     gl.cullFace(gl.FRONT);
     gl.drawElements(
       gl.TRIANGLES,
-      geometry.indices.length,
+      shape.geometry.indices.length,
       gl.UNSIGNED_SHORT,
       0
     );
@@ -176,7 +177,7 @@ export class IGfx {
     gl.cullFace(gl.BACK);
     gl.drawElements(
       gl.TRIANGLES,
-      geometry.indices.length,
+      shape.geometry.indices.length,
       gl.UNSIGNED_SHORT,
       0
     );
