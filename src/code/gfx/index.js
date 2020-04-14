@@ -18,7 +18,7 @@ export class IGfx {
     this.gl = context;
 
     this.pMatrix = projectionMatrix(
-      1,
+      0.1,
       100,
       45,
       this.canvas.width / this.canvas.height
