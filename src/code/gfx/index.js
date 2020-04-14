@@ -103,15 +103,18 @@ export class IGfx {
     gl.useProgram(program);
 
     if (uniforms.Pmatrix !== null) {
+      // transpose is true because our matrices are flat arrays in row-major format
       gl.uniformMatrix4fv(uniforms.Pmatrix, true, this.pMatrix);
     }
 
     if (uniforms.Vmatrix !== null) {
+      // transpose is true because our matrices are flat arrays in row-major format
       gl.uniformMatrix4fv(uniforms.Vmatrix, true, this.vMatrix);
     }
 
     if (uniforms.Mmatrix !== null) {
       const mMatrix = multiplyM44(this.matrixStack.top(), sizeMatrix);
+      // transpose is true because our matrices are flat arrays in row-major format
       gl.uniformMatrix4fv(uniforms.Mmatrix, true, mMatrix);
     }
 
