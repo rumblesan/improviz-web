@@ -18,7 +18,7 @@ export class PostProcessing {
 
   render(mode) {
     switch (mode) {
-      case 'paintover':
+      case 'paintOver':
         this.renderPaintOver();
         break;
       default:
