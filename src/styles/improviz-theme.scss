@@ -1,6 +1,6 @@
 @use 'solarized';
 
-$cursor-color: #fff;
+$cursor-color: #bfb;
 /*
   Name:       Improviz Theme
 */
@@ -38,17 +38,14 @@ $cursor-color: #fff;
 
   /* Vim command mode */
   &.cm-fat-cursor .CodeMirror-cursor {
-    background-color: rgba($cursor-color, 0.66);
-    opacity: 80%;
-    border: 1px solid white;
+    background-color: $cursor-color;
+    opacity: 50%;
+    border-left: 1px solid rgba(solarized.$base02, 0.8) !important;
   }
   /* Vim visual mode and selected text mode */
   .CodeMirror-line .cm-animate-fat-cursor {
     background-color: $cursor-color;
-  }
-  /* Vim insert mode and normal cursor */
-  .CodeMirror-cursor {
-    border-left: 3px solid $cursor-color;
+    border-left: 1px solid rgba(solarized.$base02, 0.8) !important;
   }
 
   /* language highlighting */
