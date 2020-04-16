@@ -1,12 +1,13 @@
 import './index.html';
 import './favicon.ico';
+
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/addon/lint/lint.css';
 import './styles/main.scss';
 
 import CodeMirror from 'codemirror';
-import 'codemirror/lib/codemirror.css';
 import 'codemirror/keymap/vim';
 import 'codemirror/addon/lint/lint.js';
-import 'codemirror/addon/lint/lint.css';
 import defineImprovizMode from './code/editor/improviz-mode';
 defineImprovizMode(CodeMirror);
 
