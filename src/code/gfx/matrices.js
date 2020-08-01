@@ -160,10 +160,10 @@ export function rotationXYZM44(xAngle, yAngle, zAngle) {
 
   // prettier-ignore
   return [
-    cx*cy, cx*sy*sz - sx*cz, cx*sy*cz + sx*sz, 0,
-    sx*cy, sx*sy*sz + cx*cz, sx*sy*cz - cx*sz, 0,
-    -sy,   cy*sz,            cy*cz,            0,
-    0,     0,                0,                1,
+    cy*cz,                      cy*-sz,       sy, 0,
+    sx*sy*cz + cx*sz, cx*cz - sx*sy*sz, -sx * cy, 0,
+    sx*sz - cx*sy*cz, cx*sy*sz + sx*cz,    cx*cy, 0,
+                   0,                0,        0, 1,
   ];
 }
 
