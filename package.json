@@ -4,12 +4,8 @@
   "description": "A web version of improviz",
   "main": "index.js",
   "scripts": {
-    "build": "npm run build:improviz && npm run build:site",
-    "start": "npm run start:improviz",
-    "build:improviz": "webpack --mode production",
-    "build:site": "npx @11ty/eleventy",
-    "start:improviz": "webpack-dev-server --mode development",
-    "start:site": "npx @11ty/eleventy --serve --port 8081",
+    "build": "webpack --mode production",
+    "start": "webpack-dev-server --mode development",
     "test": "jest test"
   },
   "bugs": {
@@ -20,7 +16,6 @@
     "url": "https://github.com/rumblesan/improviz-web"
   },
   "devDependencies": {
-    "@11ty/eleventy": "0.10.0",
     "@babel/core": "7.11.0",
     "@babel/polyfill": "7.10.4",
     "@babel/preset-env": "7.11.0",
