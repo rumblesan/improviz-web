@@ -2,7 +2,7 @@ import { Parser, Interpreter, StdLib } from './language';
 import { Program } from './language/ast';
 
 export class Improviz {
-  constructor(eventBus, gfx) {
+  constructor(gfx, eventBus) {
     this.eventBus = eventBus;
     this.gfx = gfx;
     this.parser = new Parser();
@@ -24,16 +24,22 @@ export class Improviz {
       this.runtimeErrors = [];
       const result = this.parser.parse(program);
       if (result.errors.length < 1) {
-        this.eventBus.emit('clear-error');
+        if (this.eventBus) {
+          this.eventBus.emit('clear-error');
+        }
         this.currentProgram = result.ast;
         this.workingCount = 0;
       } else {
         const errCount = result.errors.length;
         const msg = errCount === 1 ? '1 Error!' : `${errCount} Errors!`;
-        this.eventBus.emit('display-error', new Error(msg));
+        if (this.eventBus) {
+          this.eventBus.emit('display-error', new Error(msg));
+        }
       }
     } catch (err) {
-      this.eventBus.emit('display-error', err);
+      if (this.eventBus) {
+        this.eventBus.emit('display-error', err);
+      }
     }
   }
 

@@ -53,7 +53,7 @@ function start() {
 
   const gfx = new IGfx(canvas, gl);
 
-  const improviz = new Improviz(eventBus, gfx);
+  const improviz = new Improviz(gfx, eventBus);
   const editor = CodeMirror(
     el => {
       document.querySelector('body').appendChild(el);
