@@ -51,24 +51,47 @@ function start() {
     return;
   }
 
-  /*
-  const ext = gl.getExtension('WEBGL_depth_texture');
-  if (!ext) {
-    eventBus.emit(
-      'display-popup',
-      'error-popup',
-      'Sorry, there was an error starting up',
-      'Could not load WebGL Depth Texture extension'
-    );
-    return;
-  }
-  */
   const gfx = new IGfx(canvas, gl);
 
-  const improviz = new Improviz(config, eventBus, CodeMirror, gfx);
+  const improviz = new Improviz(eventBus, gfx);
+  const editor = CodeMirror(
+    el => {
+      document.querySelector('body').appendChild(el);
+    },
+    {
+      keyMap: config.keyMap,
+      lineNumbers: config.lineNumbers,
+      theme: config.theme,
+      value: config.program,
+      mode: 'improviz',
+      autofocus: true,
+      gutters: ['CodeMirror-lint-markers'],
+      lint: {
+        getAnnotations: program => {
+          const { errors } = improviz.parser.parse(program);
+          let annotations;
+          if (errors.length > 0) {
+            annotations = errors;
+          } else {
+            annotations = improviz.runtimeErrors;
+          }
+
+          return annotations.map(err => ({
+            from: CodeMirror.Pos(err.line - 1, err.character - 1),
+            to: CodeMirror.Pos(err.line - 1, err.character - 1 + err.length),
+            message: err.message,
+            severity: 'error',
+          }));
+        },
+      },
+      extraKeys: {
+        'Ctrl-Enter': () => improviz.evaluate(editor.getValue()),
+      },
+    }
+  );
 
   popups.register('sharing', true, () => {
-    const encodedProgram = encodeProgram(improviz.getProgram());
+    const encodedProgram = encodeProgram(editor.getValue());
     const programSharingURL = URL.fromLocation();
     programSharingURL.searchParams.set('program', encodedProgram);
     // TODO maybe make the entire URL clear of params???
@@ -126,6 +149,7 @@ function start() {
     eventBus.emit('display-popup', hash);
   }
 
-  improviz.start();
+  improviz.start(editor.getValue());
+  eventBus.on('evaluate', () => improviz.evaluate(editor.getValue()));
 }
 start();
