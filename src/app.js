@@ -149,7 +149,13 @@ function start() {
     eventBus.emit('display-popup', hash);
   }
 
-  improviz.start(editor.getValue());
   eventBus.on('evaluate', () => improviz.evaluate(editor.getValue()));
+
+  const improvizAnimate = improviz.genAnimateFunc(editor.getValue());
+  const animate = time => {
+    improvizAnimate(time);
+    window.requestAnimationFrame(animate);
+  };
+  animate(0);
 }
 start();

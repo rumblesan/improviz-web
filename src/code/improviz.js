@@ -37,11 +37,11 @@ export class Improviz {
     }
   }
 
-  start(program) {
+  genAnimateFunc(initialProgram) {
     this.gfx.init();
-    this.evaluate(program);
+    this.evaluate(initialProgram || '');
 
-    const animate = time => {
+    return time => {
       this.gfx.begin();
       this.stdlib.setTime(time);
       const result = this.interpreter.run(
@@ -59,8 +59,6 @@ export class Improviz {
         this.currentProgram = this.lastWorkingProgram;
         this.runtimeErrors = result.errors;
       }
-      window.requestAnimationFrame(animate);
     };
-    animate(0);
   }
 }
