@@ -3,16 +3,22 @@ savebuffer:
   vertexShader: |
     attribute vec3 position;
     attribute vec2 texcoord;
+
     varying vec2 Texcoord;
+
     void main()
     {
         Texcoord = texcoord;
         gl_Position = vec4(position, 1.0);
     }
   fragmentShader: |
+    precision mediump float;
     varying highp vec2 Texcoord;
+
     uniform sampler2D Texture;
+
     void main()
     {
-        gl_FragColor = texture2D(Texture, Texcoord);
+        vec4 texel1 = texture2D(Texture, Texcoord);
+        gl_FragColor = texel1;
     }
