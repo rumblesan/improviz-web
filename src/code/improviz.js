@@ -41,6 +41,7 @@ export class Improviz {
         this.eventBus.emit('display-error', err);
       }
     }
+    return this.runtimeErrors;
   }
 
   genAnimateFunc(initialProgram) {
@@ -65,6 +66,7 @@ export class Improviz {
         this.currentProgram = this.lastWorkingProgram;
         this.runtimeErrors = result.errors;
       }
+      return this.runtimeErrors;
     };
   }
 }
