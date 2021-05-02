@@ -1,10 +1,8 @@
-/* global WebGLDebugUtils */
 import { PostProcessing } from './post-processing';
 import { projectionMatrix, lookAt, vec3, identityM44 } from './matrices';
 import { loadAllGeometries } from './geometries';
 import { loadAllTextures } from './textures';
 import { loadAllMaterials } from './materials';
-import './webgl-debug';
 
 import { Stack } from '../util/stack';
 import { CrossFrameSetting } from '../util/cross-frame-setting';
@@ -16,14 +14,7 @@ export class IGfx {
     this.canvas = canvasEl;
     this.canvas.width = canvasEl.clientWidth;
     this.canvas.height = canvasEl.clientHeight;
-    this.gl = WebGLDebugUtils.makeDebugContext(context, (
-      err,
-      funcName /*, args*/
-    ) => {
-      throw `${WebGLDebugUtils.glEnumToString(
-        err
-      )} was cuased by call to: ${funcName}`;
-    });
+    this.gl = context;
 
     this.pMatrix = projectionMatrix(
       0.1,
