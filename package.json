@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode production",
+    "build:core": "webpack --mode production --config webpack-core.config.js",
     "start": "webpack-dev-server --mode development",
     "test": "jest test"
   },
