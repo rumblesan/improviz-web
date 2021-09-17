@@ -1,6 +1,8 @@
 @use 'solarized';
 
-$cursor-color: #bfb;
+$text-background-color: solarized.$base03;
+$fat-cursor-color: #999;
+$thin-cursor-color: #999;
 /*
   Name:       Improviz Theme
 */
@@ -17,11 +19,11 @@ $cursor-color: #bfb;
   }
 
   &.CodeMirror .CodeMirror-line > span {
-    background-color: rgba(solarized.$base03, 0.8);
+    background-color: rgba($text-background-color, 0.8);
   }
 
-  .CodeMirror-line span span.CodeMirror-selectedtext {
-    background-color: solarized.$base1;
+  .CodeMirror-selected {
+    background-color: solarized.$base01;
   }
 
   .CodeMirror-gutters {
@@ -36,16 +38,21 @@ $cursor-color: #bfb;
     z-index: 15;
   }
 
+  /* normal cursor */
+  .CodeMirror-cursor {
+    border-left: 3px solid rgba($thin-cursor-color, 1) !important;
+  }
+
   /* Vim command mode */
   &.cm-fat-cursor .CodeMirror-cursor {
-    background-color: $cursor-color;
+    background-color: $fat-cursor-color;
     opacity: 50%;
-    border-left: 1px solid rgba(solarized.$base02, 0.8) !important;
+    border: none !important;
   }
   /* Vim visual mode and selected text mode */
   .CodeMirror-line .cm-animate-fat-cursor {
-    background-color: $cursor-color;
-    border-left: 1px solid rgba(solarized.$base02, 0.8) !important;
+    background-color: $fat-cursor-color;
+    border-left: none !important;
   }
 
   /* language highlighting */
