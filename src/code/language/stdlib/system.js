@@ -10,7 +10,9 @@ export function popSnapshot() {
 }
 
 export function background(args) {
-  let [r, g, b] = args;
+  let r = args[0] || 0;
+  let g = args[1] || r;
+  let b = args[2] || g;
   if (!isNum(r)) throw new InterpreterError('Expected Number', r);
   if (!isNum(g)) throw new InterpreterError('Expected Number', g);
   if (!isNum(b)) throw new InterpreterError('Expected Number', b);
