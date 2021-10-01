@@ -32,14 +32,9 @@ transformationFunctions:
   - name: move
     code: |
       func move(x, y, z, &blk)
-        if (isNull(x))
-          b = (bpm/60) * ((time/100) + nudge)
-          x = cos(b)
-          y = sin(b)
-          z = cos(b)
-        else
-          y := 0
-          z := 0
+        x := cos((bpm/60) * ((time/10) + nudge))
+        y := x
+        z := y
         m = :move
         if (isNull(blk))
           matrix(m, x, y, z)

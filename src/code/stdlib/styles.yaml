@@ -68,3 +68,8 @@ styleFunctions:
           style(:texture, name)
           blk()
           popSnapshot()
+
+  - name: paintOver
+    code: |
+      func paintOver(name)
+        animationStyle(:paintOver)
