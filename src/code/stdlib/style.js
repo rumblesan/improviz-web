@@ -1,5 +1,6 @@
-import { InterpreterError } from '../interpreter/errors';
-import { isNum, isSymbol } from '../ffi';
+import { FFI, Errors } from '@improviz/language';
+const { isNum, isSymbol } = FFI;
+const { InterpreterError } = Errors;
 
 export function style(args) {
   const s = args.shift();

@@ -1,4 +1,6 @@
-import { tokenIdentifiers, keywords } from '../language/parser/lexer';
+import { Lexer } from '@improviz/language';
+
+const { tokenIdentifiers, keywords } = Lexer;
 
 export default function defineImprovizMode(CodeMirror) {
   CodeMirror.defineMode('improviz', function() {

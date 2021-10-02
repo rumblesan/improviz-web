@@ -1,4 +1,5 @@
-import { makeFunc, makeNum } from '../ffi';
+import { FFI } from '@improviz/language';
+const { makeFunc, makeNum } = FFI;
 
 import { style, strokeSize } from './style';
 import { shape } from './shapes';
@@ -13,10 +14,10 @@ import {
 } from './system';
 import { isNull } from './util';
 
-import { defaults } from '../../stdlib/defaults.yaml';
-import { styleFunctions } from '../../stdlib/styles.yaml';
-import { transformationFunctions } from '../../stdlib/transformations.yaml';
-import { shapeFunctions } from '../../stdlib/shapes.yaml';
+import { defaults } from './defaults.yaml';
+import { styleFunctions } from './styles.yaml';
+import { transformationFunctions } from './transformations.yaml';
+import { shapeFunctions } from './shapes.yaml';
 
 export class StdLib {
   constructor(runtime, parser, interpreter) {

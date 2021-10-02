@@ -1,12 +1,13 @@
-import { InterpreterError } from '../interpreter/errors';
-import { isNum, isSymbol } from '../ffi';
+import { FFI, Errors } from '@improviz/language';
+const { isNum, isSymbol } = FFI;
+const { InterpreterError } = Errors;
 
 import {
   scaleXYZM44,
   rotationXYZM44,
   moveXYZM44,
   multiplyM44,
-} from '../../gfx/matrices';
+} from '../gfx/matrices';
 
 export function matrix(args) {
   const s = args.shift();

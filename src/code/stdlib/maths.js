@@ -1,6 +1,6 @@
-import { makeNum } from '../ffi';
-import { InterpreterError } from '../interpreter/errors';
-import { isNum } from '../ffi';
+import { FFI, Errors } from '@improviz/language';
+const { isNum, makeNum } = FFI;
+const { InterpreterError } = Errors;
 
 const TORAD = Math.PI / 180;
 

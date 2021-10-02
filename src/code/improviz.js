@@ -1,5 +1,7 @@
-import { Parser, Interpreter, StdLib } from './language';
-import { Program } from './language/ast';
+import { Parser, Interpreter, Ast } from '@improviz/language';
+import { StdLib } from './stdlib';
+
+const { Program } = Ast;
 
 export class Improviz {
   constructor(gfx, eventBus) {
@@ -28,6 +30,7 @@ export class Improviz {
           this.eventBus.emit('clear-error');
         }
         this.currentProgram = result.ast;
+        console.log(result.ast);
         this.workingCount = 0;
       } else {
         const errCount = result.errors.length;

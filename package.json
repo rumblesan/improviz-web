@@ -45,7 +45,7 @@
     "webpack-dev-server": "4.3.0"
   },
   "dependencies": {
-    "@improviz/language": "1.1.0",
+    "@improviz/language": "1.2.0",
     "codemirror": "5.63.1"
   },
   "jest": {

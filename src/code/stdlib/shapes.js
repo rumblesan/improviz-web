@@ -1,6 +1,7 @@
-import { isNum, isSymbol } from '../ffi';
-import { InterpreterError } from '../interpreter/errors';
-import { multiplyM44, scaleXYZM44 } from '../../gfx/matrices';
+import { FFI, Errors } from '@improviz/language';
+const { isNum, isSymbol } = FFI;
+const { InterpreterError } = Errors;
+import { multiplyM44, scaleXYZM44 } from '../gfx/matrices';
 
 export function shape(args) {
   let [name, x, y, z] = args;
