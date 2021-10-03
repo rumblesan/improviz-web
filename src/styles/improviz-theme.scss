@@ -1,6 +1,5 @@
 @use 'solarized';
 
-$text-background-color: solarized.$base03;
 $fat-cursor-color: #999;
 $thin-cursor-color: #999;
 /*
@@ -9,26 +8,10 @@ $thin-cursor-color: #999;
 
 /* general text stylings */
 
-/* Specifically only make the first child span background translucent
- * otherwise there are wierd bugs with highlighted code backgrounds
- * */
 .cm-s-improviz {
-
-  &.CodeMirror {
-    background: transparent;
-  }
-
-  &.CodeMirror .CodeMirror-line > span {
-    background-color: rgba($text-background-color, 0.8);
-  }
 
   .CodeMirror-selected {
     background-color: solarized.$base01;
-  }
-
-  .CodeMirror-gutters {
-    background: transparent;
-    border-right: 0;
   }
 
   /* Cursor styling */

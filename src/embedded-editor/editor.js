@@ -1,39 +1,42 @@
 import './index.html';
-import './favicon.ico';
 
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/lint/lint.css';
-import './styles/web-main.scss';
+import '../styles/embed-main.scss';
 
 import CodeMirror from 'codemirror';
 import 'codemirror/keymap/vim';
 import 'codemirror/addon/lint/lint.js';
-import defineImprovizMode from './code/editor/improviz-mode';
+import defineImprovizMode from '../code/editor/improviz-mode';
 defineImprovizMode(CodeMirror);
 
-import './code/polyfills';
+import '../code/polyfills';
 
-import * as templates from './templates';
+import { Parser } from '@improviz/language';
 
-import { clickHandler } from './code/dom';
-import { Configuration } from './code/config';
-import { encodeProgram } from './code/util/encoder';
+import * as templates from '../templates';
 
-import { EventBus } from './code/event-bus';
-import { Popups } from './code/ui/popups';
-import { UI } from './code/ui';
-import { Improviz } from './code/improviz';
-import { IGfx } from './code/gfx';
-import { LocalStorage } from './code/LocalStorage';
+import { clickHandler } from '../code/dom';
+import { Configuration } from '../code/config';
+import { encodeProgram } from '../code/util/encoder';
+
+import { EventBus } from '../code/event-bus';
+import { Popups } from '../code/ui/popups';
+import { UI } from '../code/ui';
+import { LocalStorage } from '../code/LocalStorage';
+
+
+import ImprovizComs from './ImprovizComs';
 
 function start() {
-  const canvas = document.getElementById('canvas');
 
   const params = URL.fromLocation().searchParams;
   const cache = new LocalStorage();
   const config = new Configuration(cache, params);
   const eventBus = new EventBus();
-  const ui = new UI(eventBus);
+  new UI(eventBus);
+  const parser = new Parser();
+  const coms = new ImprovizComs(window.fetch);
   const popups = new Popups(document.querySelector('body'));
   eventBus.on('display-popup', popups.trigger.bind(popups));
   popups.register('error-popup', false, (message, error) => {
@@ -43,20 +46,6 @@ function start() {
     });
   });
 
-  const gl = canvas.getContext('webgl2');
-  if (!gl) {
-    eventBus.emit(
-      'display-popup',
-      'error-popup',
-      'Sorry, there was an error starting up',
-      'Could not create WebGL context'
-    );
-    return;
-  }
-
-  const gfx = new IGfx(canvas, gl);
-
-  const improviz = new Improviz(gfx, eventBus);
   const editor = CodeMirror(
     el => {
       document.querySelector('body').appendChild(el);
@@ -71,12 +60,10 @@ function start() {
       gutters: ['CodeMirror-lint-markers'],
       lint: {
         getAnnotations: program => {
-          const { errors } = improviz.parser.parse(program);
-          let annotations;
+          const { errors } = parser.parse(program);
+          let annotations = [];
           if (errors.length > 0) {
             annotations = errors;
-          } else {
-            annotations = improviz.runtimeErrors;
           }
 
           return annotations.map(err => ({
@@ -88,7 +75,7 @@ function start() {
         },
       },
       extraKeys: {
-        'Ctrl-Enter': () => improviz.evaluate(editor.getValue()),
+        'Ctrl-Enter': () => eventBus.emit('evaluate')
       },
     }
   );
@@ -135,35 +122,27 @@ function start() {
   });
 
   clickHandler('#evaluate', () => eventBus.emit('evaluate'));
-  clickHandler('#display-sharing', () =>
-    eventBus.emit('display-popup', 'sharing')
-  );
-  clickHandler('#display-help', () => eventBus.emit('display-popup', 'help'));
   clickHandler('#display-settings', () =>
     eventBus.emit('display-popup', 'settings')
   );
-
-  if (config.performanceMode) {
-    ui.performanceMode();
-  }
 
   const hash = URL.getHash();
   if (hash) {
     eventBus.emit('display-popup', hash);
   }
 
-  eventBus.on('evaluate', () => improviz.evaluate(editor.getValue()));
-
-  eventBus.on('saving-program', (workingCode) => {
-    console.log('saving program', workingCode);
-    cache.saveCode(workingCode);
+  eventBus.on('evaluate', () => {
+    const code = editor.getValue();
+    coms.sendCode(code)
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'error') {
+          console.log(data.payload);
+        } else if (data.status === 'ok') {
+          cache.saveCode(code);
+        }
+      });
   });
 
-  const improvizAnimate = improviz.genAnimateFunc(editor.getValue());
-  const animate = time => {
-    improvizAnimate(time);
-    window.requestAnimationFrame(animate);
-  };
-  animate(0);
 }
 start();

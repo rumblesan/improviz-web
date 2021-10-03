@@ -8,30 +8,30 @@ const defaultConfig = {
   program: 't = time/100\nrotate(t)\nfill(1, 0, 0.8, 0.5)\ncube(1)',
 };
 
-export function getConfig() {
-  const params = URL.fromLocation().searchParams;
+export class Configuration {
+  constructor(cache, params) {
 
-  const keyMap = params.has('keymap')
-    ? params.get('keymap')
-    : defaultConfig.keyMap;
+    this.keyMap = params.has('keymap')
+      ? params.get('keymap')
+      : defaultConfig.keyMap;
 
-  const lineNumbers = params.has('linenumbers') | defaultConfig.lineNumbers;
+    this.lineNumbers = params.has('linenumbers') | defaultConfig.lineNumbers;
 
-  const theme = params.has('theme') ? params.get('theme') : defaultConfig.theme;
+    this.theme = params.has('theme') ? params.get('theme') : defaultConfig.theme;
 
-  const performanceMode =
-    params.has('performancemode') | defaultConfig.performanceMode;
+    this.performanceMode =
+      params.has('performancemode') | defaultConfig.performanceMode;
 
-  // TODO this could do with error handling
-  const program = params.has('program')
-    ? decodeProgram(params.get('program'))
-    : defaultConfig.program;
+    // TODO this could do with error handling
+    this.program = defaultConfig.program;
+    console.log('got program', this.program);
+    if (params.has('program')) {
+      console.log('loading program from URL param');
+      this.program = decodeProgram(params.get('program'));
+    } else if (cache.loadCode()) {
+      console.log('loading program from storage cache');
+      this.program = cache.loadCode();
+    }
 
-  return {
-    keyMap,
-    lineNumbers,
-    theme,
-    performanceMode,
-    program,
-  };
+  }
 }

@@ -1,0 +1,41 @@
+@use 'solarized';
+@use 'nav';
+@use 'improviz-theme';
+@use 'popups';
+@use 'noscript';
+@use 'util';
+@use 'layout';
+
+/* Styling */
+
+body {
+  background-color: solarized.$base03;
+  font-size: 16px;
+  font-family: Tahoma, Geneva, sans-serif;
+}
+
+header {
+  color: solarized.$base0;
+  background-color: solarized.$base02;
+}
+
+a {
+  color: solarized.$violet;
+}
+
+button {
+  color: solarized.$green;
+  border: 1px solid solarized.$green;
+  background-color: solarized.$base02;
+  border-radius: 3px;
+}
+
+button:hover {
+  color: solarized.$base02;
+  background-color: solarized.$blue;
+}
+
+
+.CodeMirror {
+  font-size: 1.125rem;
+}

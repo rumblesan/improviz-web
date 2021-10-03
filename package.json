@@ -7,6 +7,7 @@
     "lint": "eslint src",
     "build": "webpack --mode production",
     "build:core": "webpack --mode production --config webpack-core.config.js",
+    "build:editor": "webpack --mode production --config webpack-editor.config.js",
     "start": "webpack-dev-server --mode development",
     "test": "jest test"
   },

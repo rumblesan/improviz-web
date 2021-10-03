@@ -11,13 +11,16 @@ export class Improviz {
     this.interpreter = new Interpreter();
     this.stdlib = new StdLib(gfx, this.parser, this.interpreter);
     this.lastWorkingProgram = Program([]);
+    this.lastWorkingCode = '';
     this.workingCount = 0;
     this.currentProgram = Program([]);
+    this.currentCode = '';
     this.runtimeErrors = [];
   }
 
   resetToLastWorkingProgram() {
     this.currentProgram = this.lastWorkingProgram;
+    this.currentCode = this.lastWorkingCode;
     this.workingCount = 0;
   }
 
@@ -30,6 +33,7 @@ export class Improviz {
           this.eventBus.emit('clear-error');
         }
         this.currentProgram = result.ast;
+        this.currentCode = program;
         console.log(result.ast);
         this.workingCount = 0;
       } else {
@@ -63,10 +67,13 @@ export class Improviz {
         this.workingCount += 1;
         if (this.workingCount === 10) {
           this.lastWorkingProgram = this.currentProgram;
+          this.lastWorkingCode = this.currentCode;
+          this.eventBus.emit('saving-program', this.lastWorkingCode);
         }
       } else {
         this.workingCount = 0;
         this.currentProgram = this.lastWorkingProgram;
+        this.currentCode = this.lastWorkingCode;
         this.runtimeErrors = result.errors;
       }
       return this.runtimeErrors;
