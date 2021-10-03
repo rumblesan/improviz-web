@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint src",
-    "build": "webpack --mode production",
-    "build:core": "webpack --mode production --config webpack-core.config.js",
-    "build:editor": "webpack --mode production --config webpack-editor.config.js",
-    "start": "webpack-dev-server --mode development",
+    "build": "webpack --mode production --config builds/app.config.js",
+    "build:core": "webpack --mode production --config builds/core.config.js",
+    "build:editor": "webpack --mode production --config builds/editor.config.js",
+    "start": "webpack-dev-server --mode development --config builds/app.config.js",
     "test": "jest test"
   },
   "bugs": {

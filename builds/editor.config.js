@@ -2,11 +2,12 @@
 
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const root = path.resolve(__dirname, '..');
 
 module.exports = {
-  entry: path.resolve(__dirname, 'src/embedded-editor/editor.js'),
+  entry: path.resolve(root, 'src/embedded-editor/editor.js'),
   output: {
-    path: path.resolve(__dirname, 'editor'),
+    path: path.resolve(root, 'dist/editor'),
     filename: 'app.js',
   },
   plugins: [new MiniCssExtractPlugin()],
@@ -15,8 +16,8 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: [
-          path.resolve(__dirname, 'node_modules'),
-          path.resolve(__dirname, 'codemirror'),
+          path.resolve(root, 'node_modules'),
+          path.resolve(root, 'codemirror'),
         ],
         loader: 'babel-loader',
         options: {
@@ -47,7 +48,7 @@ module.exports = {
       {
         test: /\.bmp$|\.png$/,
         loader: 'file-loader',
-        include: [path.resolve(__dirname, 'src/textures')],
+        include: [path.resolve(root, 'src/textures')],
         options: {
           name: '[name].[ext]',
         },
