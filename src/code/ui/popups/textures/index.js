@@ -2,12 +2,10 @@ import texturesTemplate from './textures.handlebars';
 
 export function texturesMarkup (gfx) {
   return () => {
-    console.log(gfx.textures);
     const tlist = Object.keys(gfx.textures).map(k => ({
       name: k,
       url: gfx.textures[k].image.src,
     }));
-    console.log(tlist);
     return texturesTemplate({textures: tlist});
   };
 }
