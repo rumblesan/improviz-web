@@ -43,9 +43,16 @@ export class IGfx {
     loadedMaterials.errors.forEach(e => console.log(e));
     this.materials = loadedMaterials.materials;
 
-    const loadedTextures = loadAllTextures(this.gl);
-    loadedTextures.errors.forEach(e => console.log(e));
-    this.textures = loadedTextures.textures;
+    this.textures = {};
+    loadAllTextures(this.gl).then(textures => {
+      textures.forEach(t => {
+        if (t.loaded) {
+          this.textures[t.name] = t;
+        } else {
+          console.error(t.error);
+        }
+      });
+    });
 
     this.postProcessing = new PostProcessing(this.canvas, this.gl);
   }
@@ -85,12 +92,13 @@ export class IGfx {
   }
 
   loadTexture(name, url) {
-    try {
-      this.textures[name] = loadTextureURL(this.gl, url);
-    } catch (e) {
-      return {error: e};
-    }
-    console.log(this.textures);
+    loadTextureURL(this.gl, {name, url}).then(texture => {
+      if (texture.loaded) {
+        this.textures[name] = texture;
+      } else {
+        console.error(texture.error);
+      }
+    });
   }
 
   setUniform(name, location) {
