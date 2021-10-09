@@ -30,5 +30,10 @@ export function settingsEventHandlers (settings) {
       .addEventListener('change', e => {
         settings.set('lineNumbers', e.target.checked);
       });
+
+    el.querySelector('button[name=clear]')
+      .addEventListener('click', () => {
+        settings.clear();
+      });
   };
 }
