@@ -17,7 +17,7 @@ export class Popups {
     };
   }
 
-  trigger(name) {
+  trigger(name, ...args) {
     const p = this.popups[name];
     if (!p) {
       return;
@@ -44,7 +44,7 @@ export class Popups {
     const popup = document.createElement('div');
     popup.setAttribute('id', 'popup-window');
     popup.classList.add('popup-window');
-    popup.innerHTML = p.markupGenerator();
+    popup.innerHTML = p.markupGenerator(...args);
     if (p.eventHandlers) {
       p.eventHandlers(popup);
     }

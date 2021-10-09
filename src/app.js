@@ -13,15 +13,15 @@ defineImprovizMode(CodeMirror);
 
 import './code/polyfills';
 
-import * as templates from './templates';
-
 import { clickHandler } from './code/dom';
 import { Settings } from './code/settings';
-import { encodeProgram } from './code/util/encoder';
 
 import { EventBus } from './code/event-bus';
 import { Popups } from './code/ui/popups';
 import { settingsMarkup, settingsEventHandlers } from './code/ui/popups/settings';
+import { sharingMarkup } from './code/ui/popups/sharing';
+import { helpMarkup } from './code/ui/popups/help';
+import { errorMarkup } from './code/ui/popups/error';
 import { UI } from './code/ui';
 import { Improviz } from './code/improviz';
 import { IGfx } from './code/gfx';
@@ -32,15 +32,10 @@ function start() {
 
   const settings = new Settings(eventBus);
   settings.load(URL.fromLocation().searchParams);
-  const ui = new UI(eventBus, settings);
+  new UI(eventBus, settings);
   const popups = new Popups(document.querySelector('body'));
   eventBus.on('display-popup', popups.trigger.bind(popups));
-  popups.register('error-popup', false, (el, message, error) => {
-    return templates.errorPopup({
-      message,
-      error,
-    });
-  });
+  popups.register('error-popup', false, errorMarkup());
 
   const gl = canvas.getContext('webgl2');
   if (!gl) {
@@ -92,21 +87,11 @@ function start() {
     }
   );
 
-  popups.register('sharing', true, () => {
-    const encodedProgram = encodeProgram(editor.getValue());
-    const programSharingURL = URL.fromLocation();
-    programSharingURL.searchParams.set('program', encodedProgram);
-    programSharingURL.hash = '';
-    return templates.sharingPopup({
-      programSharingURL: programSharingURL.toString(),
-    });
-  });
+  popups.register('sharing', true, sharingMarkup(editor));
 
   popups.register('settings', true, settingsMarkup(settings), settingsEventHandlers(settings));
 
-  popups.register('help', true, () => {
-    return templates.helpPopup();
-  });
+  popups.register('help', true, helpMarkup());
 
   clickHandler('#evaluate', () => eventBus.emit('evaluate'));
   clickHandler('#display-sharing', () =>
