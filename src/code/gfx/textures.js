@@ -1,14 +1,18 @@
 import algorave from '../../textures/algorave.png';
 import crystal from '../../textures/crystal.bmp';
 
+const builtInTextures = [
+  { name: 'algorave', url: algorave },
+  { name: 'crystal', url: crystal },
+];
+
 export function loadAllTextures(gl) {
   const errors = [];
   const textures = {};
 
-  [algorave, crystal].forEach(texture => {
+  builtInTextures.forEach(({name, url}) => {
     try {
-      const image = loadTexture(gl, texture);
-      const name = texture.split('.')[0];
+      const image = loadTextureURL(gl, url);
       textures[name] = image;
     } catch (e) {
       errors.push(e);
@@ -21,7 +25,7 @@ export function loadAllTextures(gl) {
   };
 }
 
-export function loadTexture(gl, url) {
+export function loadTextureURL(gl, url) {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -51,6 +55,7 @@ export function loadTexture(gl, url) {
   );
 
   const image = new Image();
+  image.crossOrigin = "anonymous";
   image.onload = function() {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(
@@ -76,9 +81,12 @@ export function loadTexture(gl, url) {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     }
   };
+  image.onerror = function() {
+    console.log(`Error loading ${url}`);
+  };
   image.src = url;
 
-  return texture;
+  return {texture, image};
 }
 
 function isPowerOf2(value) {

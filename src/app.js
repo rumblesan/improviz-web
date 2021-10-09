@@ -22,6 +22,7 @@ import { settingsMarkup, settingsEventHandlers } from './code/ui/popups/settings
 import { sharingMarkup } from './code/ui/popups/sharing';
 import { helpMarkup } from './code/ui/popups/help';
 import { errorMarkup } from './code/ui/popups/error';
+import { texturesMarkup, texturesEventHandlers } from './code/ui/popups/textures';
 import { UI } from './code/ui';
 import { Improviz } from './code/improviz';
 import { IGfx } from './code/gfx';
@@ -88,16 +89,20 @@ function start() {
   );
 
   popups.register('sharing', true, sharingMarkup(editor));
-
-  popups.register('settings', true, settingsMarkup(settings), settingsEventHandlers(settings));
-
   popups.register('help', true, helpMarkup());
+  popups.register('textures', true, texturesMarkup(gfx), texturesEventHandlers(eventBus));
+  popups.register('settings', true, settingsMarkup(settings), settingsEventHandlers(settings));
 
   clickHandler('#evaluate', () => eventBus.emit('evaluate'));
   clickHandler('#display-sharing', () =>
     eventBus.emit('display-popup', 'sharing')
   );
-  clickHandler('#display-help', () => eventBus.emit('display-popup', 'help'));
+  clickHandler('#display-help', () =>
+    eventBus.emit('display-popup', 'help')
+  );
+  clickHandler('#display-textures', () =>
+    eventBus.emit('display-popup', 'textures')
+  );
   clickHandler('#display-settings', () =>
     eventBus.emit('display-popup', 'settings', settings)
   );
@@ -111,6 +116,10 @@ function start() {
 
   eventBus.on('saving-program', (workingCode) => {
     settings.set('program', workingCode);
+  });
+
+  eventBus.on('load-texture', (name, url) => {
+    gfx.loadTexture(name, url);
   });
 
   const improvizAnimate = improviz.genAnimateFunc(editor.getValue());

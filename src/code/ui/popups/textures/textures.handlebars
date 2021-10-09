@@ -1,0 +1,27 @@
+<div class='title'>
+  <h3>Textures</h3>
+  <button id='popup-close' class='close'>Close</button>
+</div>
+<hr />
+<div class='content'>
+
+  <section>
+    <ul id="textureList">
+      {{#each textures}}
+        <li>{{this.name}} - {{this.url}}</li>
+      {{/each}}
+    </ul>
+  </section>
+
+  <section>
+    <p>
+      Add a custom texture from a URL
+    </p>
+    <form id="addTexture">
+      <label for="name">Name: <input type="text" name="name"></label>
+      <label for="name">URL: <input type="text" name="url"></label>
+      <input type="submit" />
+    </form>
+  </section>
+
+</div>

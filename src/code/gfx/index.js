@@ -1,7 +1,7 @@
 import { PostProcessing } from './post-processing';
 import { projectionMatrix, lookAt, vec3, identityM44 } from './matrices';
 import { loadAllGeometries } from './geometries';
-import { loadAllTextures } from './textures';
+import { loadAllTextures, loadTextureURL } from './textures';
 import { loadAllMaterials } from './materials';
 
 import { Stack } from '../util/stack';
@@ -81,7 +81,16 @@ export class IGfx {
   getTexture() {
     const name = this.textureStack.top();
     const t = this.textures[name];
-    return exists(t) ? t : this.textures.crystal;
+    return exists(t) ? t.texture : this.textures.crystal;
+  }
+
+  loadTexture(name, url) {
+    try {
+      this.textures[name] = loadTextureURL(this.gl, url);
+    } catch (e) {
+      return {error: e};
+    }
+    console.log(this.textures);
   }
 
   setUniform(name, location) {

@@ -34,7 +34,6 @@ export class Improviz {
         }
         this.currentProgram = result.ast;
         this.currentCode = program;
-        console.log(result.ast);
         this.workingCount = 0;
       } else {
         const errCount = result.errors.length;

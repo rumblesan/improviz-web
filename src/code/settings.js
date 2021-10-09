@@ -60,7 +60,6 @@ export class Settings {
   }
 
   set(key, value) {
-    console.log(`setting ${key} to ${value}`);
     this.settings[key] = value;
     this.saveSetting(key);
     this.eventBus.emit('settings', this.settings);
