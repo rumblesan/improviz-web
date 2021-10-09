@@ -16,27 +16,26 @@ import './code/polyfills';
 import * as templates from './templates';
 
 import { clickHandler } from './code/dom';
-import { Configuration } from './code/config';
+import { Settings } from './code/settings';
 import { encodeProgram } from './code/util/encoder';
 
 import { EventBus } from './code/event-bus';
 import { Popups } from './code/ui/popups';
+import { settingsMarkup, settingsEventHandlers } from './code/ui/popups/settings';
 import { UI } from './code/ui';
 import { Improviz } from './code/improviz';
 import { IGfx } from './code/gfx';
-import { LocalStorage } from './code/LocalStorage';
 
 function start() {
   const canvas = document.getElementById('canvas');
-
-  const params = URL.fromLocation().searchParams;
-  const cache = new LocalStorage();
-  const config = new Configuration(cache, params);
   const eventBus = new EventBus();
-  const ui = new UI(eventBus);
+
+  const settings = new Settings(eventBus);
+  settings.load(URL.fromLocation().searchParams);
+  const ui = new UI(eventBus, settings);
   const popups = new Popups(document.querySelector('body'));
   eventBus.on('display-popup', popups.trigger.bind(popups));
-  popups.register('error-popup', false, (message, error) => {
+  popups.register('error-popup', false, (el, message, error) => {
     return templates.errorPopup({
       message,
       error,
@@ -62,10 +61,10 @@ function start() {
       document.querySelector('body').appendChild(el);
     },
     {
-      keyMap: config.keyMap,
-      lineNumbers: config.lineNumbers,
-      theme: config.theme,
-      value: config.program,
+      keyMap: settings.get('keyMap'),
+      lineNumbers: settings.get('lineNumbers'),
+      theme: settings.get('theme'),
+      value: settings.get('program'),
       mode: 'improviz',
       autofocus: true,
       gutters: ['CodeMirror-lint-markers'],
@@ -97,38 +96,13 @@ function start() {
     const encodedProgram = encodeProgram(editor.getValue());
     const programSharingURL = URL.fromLocation();
     programSharingURL.searchParams.set('program', encodedProgram);
-    // TODO maybe make the entire URL clear of params???
     programSharingURL.hash = '';
     return templates.sharingPopup({
       programSharingURL: programSharingURL.toString(),
     });
   });
 
-  popups.register('settings', true, () => {
-    const defaultKeymapURL = URL.fromLocation();
-    defaultKeymapURL.searchParams.delete('keymap');
-    const vimKeymapURL = URL.fromLocation();
-    vimKeymapURL.searchParams.set('keymap', 'vim');
-
-    const performanceDisabledURL = URL.fromLocation();
-    performanceDisabledURL.searchParams.delete('performancemode');
-    const performanceEnabledURL = URL.fromLocation();
-    performanceEnabledURL.searchParams.set('performancemode', 'enabled');
-
-    const lineNumbersDisabledURL = URL.fromLocation();
-    lineNumbersDisabledURL.searchParams.delete('linenumbers');
-    const lineNumbersEnabledURL = URL.fromLocation();
-    lineNumbersEnabledURL.searchParams.set('linenumbers', 'enabled');
-
-    return templates.settingsPopup({
-      defaultKeymapURL: defaultKeymapURL.toString(),
-      vimKeymapURL: vimKeymapURL.toString(),
-      performanceEnabledURL: performanceEnabledURL.toString(),
-      performanceDisabledURL: performanceDisabledURL.toString(),
-      lineNumbersEnabledURL: lineNumbersEnabledURL.toString(),
-      lineNumbersDisabledURL: lineNumbersDisabledURL.toString(),
-    });
-  });
+  popups.register('settings', true, settingsMarkup(settings), settingsEventHandlers(settings));
 
   popups.register('help', true, () => {
     return templates.helpPopup();
@@ -140,12 +114,8 @@ function start() {
   );
   clickHandler('#display-help', () => eventBus.emit('display-popup', 'help'));
   clickHandler('#display-settings', () =>
-    eventBus.emit('display-popup', 'settings')
+    eventBus.emit('display-popup', 'settings', settings)
   );
-
-  if (config.performanceMode) {
-    ui.performanceMode();
-  }
 
   const hash = URL.getHash();
   if (hash) {
@@ -155,8 +125,7 @@ function start() {
   eventBus.on('evaluate', () => improviz.evaluate(editor.getValue()));
 
   eventBus.on('saving-program', (workingCode) => {
-    console.log('saving program', workingCode);
-    cache.saveCode(workingCode);
+    settings.set('program', workingCode);
   });
 
   const improvizAnimate = improviz.genAnimateFunc(editor.getValue());

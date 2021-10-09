@@ -1,12 +1,21 @@
 export class UI {
-  constructor(eventBus) {
+  constructor(eventBus, settings) {
     eventBus.on('display-error', err => this.displayError(err));
     eventBus.on('clear-error', () => this.clearError());
     eventBus.on('clear-error', () => this.clearError());
+    eventBus.on('settings', (settings) => {
+      this.setPerformanceMode(settings.performanceMode);
+    });
+    this.settings = settings;
+    this.setPerformanceMode(settings.performanceMode);
   }
 
-  performanceMode() {
-    document.querySelector('body').classList.add('performance-mode');
+  setPerformanceMode(enabled) {
+    if (enabled) {
+      document.querySelector('body').classList.add('performance-mode');
+    } else {
+      document.querySelector('body').classList.remove('performance-mode');
+    }
   }
 
   displayError(err) {

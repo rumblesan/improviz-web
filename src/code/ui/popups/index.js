@@ -8,16 +8,18 @@ export class Popups {
     this.displayedPopupEl = null;
   }
 
-  register(name, displayHash, markupGenerator) {
+  register(name, displayHash, markupGenerator, eventHandlers) {
     this.popups[name] = {
       name,
-      markupGenerator: markupGenerator,
       displayHash,
+      markupGenerator,
+      eventHandlers,
     };
   }
 
-  trigger(name, ...args) {
-    if (!this.popups[name]) {
+  trigger(name) {
+    const p = this.popups[name];
+    if (!p) {
       return;
     }
 
@@ -35,14 +37,17 @@ export class Popups {
     }
 
     this.displayedPopupName = name;
-    if (this.popups[name].displayHash) {
+    if (p.displayHash) {
       URL.setHash(this.displayedPopupName);
     }
 
     const popup = document.createElement('div');
     popup.setAttribute('id', 'popup-window');
     popup.classList.add('popup-window');
-    popup.innerHTML = this.popups[name].markupGenerator(...args);
+    popup.innerHTML = p.markupGenerator();
+    if (p.eventHandlers) {
+      p.eventHandlers(popup);
+    }
 
     const closeButton = popup.querySelector('#popup-close');
     if (closeButton) {
