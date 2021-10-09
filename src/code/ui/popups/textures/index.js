@@ -26,5 +26,29 @@ export function texturesEventHandlers (eventBus) {
       el.querySelector("#textureList").appendChild(li);
       return false;
     });
+
+    const imageUploadForm = el.querySelector('#imageUpload');
+    const image = new Image();
+    image.onload = function () {
+      console.log('loaded uploaded image');
+    };
+    image.onerror = function () {
+      console.log('error uploaded image');
+    };
+    imageUploadForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const data = new FormData(imageUploadForm);
+      const reader = new FileReader();
+      reader.onload = function () {
+        eventBus.emit('load-texture', data.get('name'), reader.result);
+      };
+      reader.onerror = function () {
+        console.log(reader.error);
+      };
+      reader.readAsDataURL(data.get('image'));
+
+      return false;
+    });
+
   };
 }

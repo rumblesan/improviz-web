@@ -6,11 +6,24 @@
 <div class='content'>
 
   <section>
+    <h4>Available Textures</h4>
     <ul id="textureList">
       {{#each textures}}
         <li>{{this.name}} - {{this.url}}</li>
       {{/each}}
     </ul>
+  </section>
+
+  <section>
+    <p>
+      Upload a file
+    </p>
+    <form id="imageUpload">
+      <label for="name">Name: <input type="text" name="name"></label>
+      <label for="name">Name: <input type="file" name="image" accept="image/png, image/jpg"></label>
+      <br />
+      <input type="submit" />
+    </form>
   </section>
 
   <section>
