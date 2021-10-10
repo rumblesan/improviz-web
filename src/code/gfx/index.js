@@ -1,7 +1,7 @@
 import { PostProcessing } from './post-processing';
 import { projectionMatrix, lookAt, vec3, identityM44 } from './matrices';
 import { loadAllGeometries } from './geometries';
-import { loadAllTextures, loadTextureURL } from './textures';
+import { loadTextureFromURL } from './textures';
 import { loadAllMaterials } from './materials';
 
 import { Stack } from '../util/stack';
@@ -15,6 +15,9 @@ export class IGfx {
     this.canvas.width = canvasEl.clientWidth;
     this.canvas.height = canvasEl.clientHeight;
     this.gl = context;
+    this.geometries = {};
+    this.materials = {};
+    this.textures = {};
 
     this.pMatrix = projectionMatrix(
       0.1,
@@ -42,17 +45,6 @@ export class IGfx {
     const loadedMaterials = loadAllMaterials(this.gl);
     loadedMaterials.errors.forEach(e => console.log(e));
     this.materials = loadedMaterials.materials;
-
-    this.textures = {};
-    loadAllTextures(this.gl).then(textures => {
-      textures.forEach(t => {
-        if (t.loaded) {
-          this.textures[t.name] = t;
-        } else {
-          console.error(t.error);
-        }
-      });
-    });
 
     this.postProcessing = new PostProcessing(this.canvas, this.gl);
   }
@@ -92,13 +84,12 @@ export class IGfx {
   }
 
   loadTexture(name, url) {
-    loadTextureURL(this.gl, {name, url}).then(texture => {
-      if (texture.loaded) {
+    loadTextureFromURL(this.gl, {name, url})
+      .then(texture => {
         this.textures[name] = texture;
-      } else {
-        console.error(texture.error);
-      }
-    });
+      }).catch(error => {
+        console.error(error);
+      });
   }
 
   setUniform(name, location) {

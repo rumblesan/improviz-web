@@ -26,6 +26,7 @@ import { texturesMarkup, texturesEventHandlers } from './code/ui/popups/textures
 import { UI } from './code/ui';
 import { Improviz } from './code/improviz';
 import { IGfx } from './code/gfx';
+import { builtInTextures } from './textures';
 
 function start() {
   const canvas = document.getElementById('canvas');
@@ -50,6 +51,7 @@ function start() {
   }
 
   const gfx = new IGfx(canvas, gl);
+  builtInTextures.map(({name, url}) => gfx.loadTexture(name, url));
 
   const improviz = new Improviz(gfx, eventBus);
   const editor = CodeMirror(

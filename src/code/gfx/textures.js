@@ -1,19 +1,4 @@
-import algorave from '../../textures/algorave.png';
-import crystal from '../../textures/crystal.bmp';
-
-const builtInTextures = [
-  { name: 'algorave', url: algorave },
-  { name: 'crystal', url: crystal },
-];
-
-export function loadAllTextures(gl) {
-  return Promise.all(
-    builtInTextures
-      .map(imageToLoad => loadTextureURL(gl, imageToLoad))
-  );
-}
-
-export function loadTextureURL(gl, imageToLoad) {
+export function loadTextureFromURL(gl, imageToLoad) {
   const texture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, texture);
 
@@ -45,7 +30,7 @@ export function loadTextureURL(gl, imageToLoad) {
   const image = new Image();
   image.crossOrigin = "anonymous";
 
-  const p = new Promise(resolve => {
+  const p = new Promise((resolve, reject) => {
     image.onload = function() {
       gl.bindTexture(gl.TEXTURE_2D, texture);
       gl.texImage2D(
@@ -70,10 +55,10 @@ export function loadTextureURL(gl, imageToLoad) {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
       }
-      resolve({name: imageToLoad.name, loaded: true, image, texture});
+      resolve({name: imageToLoad.name, image, texture});
     };
     image.onerror = function() {
-      resolve({name: imageToLoad.name, loaded: false, error: `Could not load ${imageToLoad.name}`});
+      reject(`Could not load ${imageToLoad.name}`);
     };
   });
   image.src = imageToLoad.url;
