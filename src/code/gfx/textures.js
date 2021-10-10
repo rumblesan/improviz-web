@@ -69,3 +69,7 @@ export function loadTextureFromURL(gl, imageToLoad) {
 function isPowerOf2(value) {
   return (value & (value - 1)) == 0;
 }
+
+export function removeTexture(gl, texture) {
+  gl.deleteTexture(texture);
+}

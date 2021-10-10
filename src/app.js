@@ -123,6 +123,9 @@ function start() {
   eventBus.on('load-texture', (name, url) => {
     gfx.loadTexture(name, url);
   });
+  eventBus.on('unload-texture', (name) => {
+    gfx.unloadTexture(name);
+  });
 
   const improvizAnimate = improviz.genAnimateFunc(editor.getValue());
   const animate = time => {
