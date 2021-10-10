@@ -15,6 +15,7 @@ import './code/polyfills';
 
 import { clickHandler } from './code/dom';
 import { Settings } from './code/settings';
+import { DataCache } from './code/DataCache';
 
 import { EventBus } from './code/event-bus';
 import { Popups } from './code/ui/popups';
@@ -32,6 +33,7 @@ function start() {
   const canvas = document.getElementById('canvas');
   const eventBus = new EventBus();
 
+  const dataCache = new DataCache();
   const settings = new Settings(eventBus);
   settings.load(URL.fromLocation().searchParams);
   new UI(eventBus, settings);
@@ -51,7 +53,15 @@ function start() {
   }
 
   const gfx = new IGfx(canvas, gl);
-  builtInTextures.map(({name, url}) => gfx.loadTexture(name, url));
+  const cachedTextures = dataCache.load('textures');
+  const texturesToLoad = cachedTextures ? cachedTextures : builtInTextures;
+  Promise.all(
+    texturesToLoad.map(t => gfx.loadTexture(t))
+  ).then(() => {
+    const allTextures = gfx.getAllTextures();
+    if (!allTextures.algorave) gfx.loadTexture(builtInTextures.algorave);
+    if (!allTextures.crystal) gfx.loadTexture(builtInTextures.crystal);
+  });
 
   const improviz = new Improviz(gfx, eventBus);
   const editor = CodeMirror(
@@ -120,11 +130,28 @@ function start() {
     settings.set('program', workingCode);
   });
 
-  eventBus.on('load-texture', (name, url) => {
-    gfx.loadTexture(name, url);
+  eventBus.on('load-texture', texture => {
+    gfx.loadTexture(texture).then( () => {
+      const allTextures = gfx.getAllTextures();
+      const textures = Object
+        .keys(allTextures)
+        .map(name => ({
+          name,
+          url: allTextures[name].image.src,
+        }));
+      dataCache.save('textures', textures);
+    });
   });
   eventBus.on('unload-texture', (name) => {
     gfx.unloadTexture(name);
+    const allTextures = gfx.getAllTextures();
+    const textures = Object
+      .keys(allTextures)
+      .map(name => ({
+        name,
+        url: allTextures[name].image.src,
+      }));
+    dataCache.save('textures', textures);
   });
 
   const improvizAnimate = improviz.genAnimateFunc(editor.getValue());

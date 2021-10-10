@@ -18,7 +18,9 @@ export function texturesEventHandlers (eventBus) {
       const data = new FormData(form);
       const name = data.get('name');
       const url = data.get('url');
-      eventBus.emit('load-texture', name, url);
+      if (name && url) {
+        eventBus.emit('load-texture', {name, url});
+      }
       return false;
     });
 
@@ -26,9 +28,13 @@ export function texturesEventHandlers (eventBus) {
     imageUploadForm.addEventListener('submit', e => {
       e.preventDefault();
       const data = new FormData(imageUploadForm);
+      const name = data.get('name');
+      if (!name) return false;
       const reader = new FileReader();
       reader.onload = function () {
-        eventBus.emit('load-texture', data.get('name'), reader.result);
+        eventBus.emit('load-texture',
+          {name: data.get('name'), url: reader.result}
+        );
       };
       reader.onerror = function () {
         console.log(reader.error);

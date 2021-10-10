@@ -83,8 +83,12 @@ export class IGfx {
     return exists(t) ? t.texture : null;
   }
 
-  loadTexture(name, url) {
-    loadTextureFromURL(this.gl, {name, url})
+  getAllTextures() {
+    return this.textures;
+  }
+
+  loadTexture({name, url}) {
+    return loadTextureFromURL(this.gl, {name, url})
       .then(texture => {
         this.textures[name] = texture;
       }).catch(error => {
@@ -96,7 +100,7 @@ export class IGfx {
     const t = this.textures[name];
     if (t) {
       removeTexture(this.gl, t.texture);
-      this.textures[name] = null;
+      delete this.textures[name];
     }
   }
 
