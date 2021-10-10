@@ -1,33 +1,8 @@
 import { MaterialError } from '../errors';
 import { compileShaderProgram } from '../shaders';
 
-import { material as basic } from './basic.yaml';
-import { material as weird } from './weird.yaml';
-import { material as texture } from './texture.yaml';
-import { material as bordered } from './bordered.yaml';
-import { material as normalised } from './normalised.yaml';
-import { material as ceed } from './ceed.yaml';
 
-export function loadAllMaterials(gl) {
-  const errors = [];
-  const materials = {};
-
-  [basic, weird, texture, bordered, normalised, ceed].forEach(m => {
-    try {
-      const loaded = loadMaterial(gl, m);
-      materials[loaded.name] = loaded;
-    } catch (e) {
-      errors.push(e);
-    }
-  });
-
-  return {
-    errors,
-    materials,
-  };
-}
-
-export function loadMaterial(gl, material) {
+export function loadMaterialYAML(gl, material) {
   const program = compileShaderProgram(
     gl,
     material.name,

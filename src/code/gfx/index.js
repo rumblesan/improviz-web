@@ -1,8 +1,9 @@
 import { PostProcessing } from './post-processing';
 import { projectionMatrix, lookAt, vec3, identityM44 } from './matrices';
-import { loadAllGeometries } from './geometries';
+
+import { loadGeometryOBJ } from './geometries';
 import { loadTextureFromURL, removeTexture } from './textures';
-import { loadAllMaterials } from './materials';
+import { loadMaterialYAML } from './materials';
 
 import { Stack } from '../util/stack';
 import { CrossFrameSetting } from '../util/cross-frame-setting';
@@ -37,15 +38,6 @@ export class IGfx {
     this.background = new CrossFrameSetting([1, 1, 1]);
     this.depthCheck = new CrossFrameSetting(true);
     this.renderMode = new CrossFrameSetting('normal');
-
-    const loadedGeometries = loadAllGeometries(this.gl);
-    loadedGeometries.errors.forEach(e => console.log(e));
-    this.geometries = loadedGeometries.geometries;
-
-    const loadedMaterials = loadAllMaterials(this.gl);
-    loadedMaterials.errors.forEach(e => console.log(e));
-    this.materials = loadedMaterials.materials;
-
     this.postProcessing = new PostProcessing(this.canvas, this.gl);
   }
 
@@ -101,6 +93,24 @@ export class IGfx {
     if (t) {
       removeTexture(this.gl, t.texture);
       delete this.textures[name];
+    }
+  }
+
+  loadMaterial(material) {
+    try {
+      const loaded = loadMaterialYAML(this.gl, material);
+      this.materials[loaded.name] = loaded;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  loadGeometry(name, geometry, removeCrossBar = false) {
+    try {
+      const loaded = loadGeometryOBJ(this.gl, name, geometry, removeCrossBar);
+      this.geometries[loaded.name] = loaded;
+    } catch (e) {
+      console.error(e);
     }
   }
 

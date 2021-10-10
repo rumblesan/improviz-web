@@ -28,6 +28,8 @@ import { UI } from './code/ui';
 import { Improviz } from './code/improviz';
 import { IGfx } from './code/gfx';
 import { builtInTextures } from './textures';
+import * as materials from './materials';
+import * as geometries from './geometries';
 
 function start() {
   const canvas = document.getElementById('canvas');
@@ -62,6 +64,14 @@ function start() {
     if (!allTextures.algorave) gfx.loadTexture(builtInTextures.algorave);
     if (!allTextures.crystal) gfx.loadTexture(builtInTextures.crystal);
   });
+
+  Object.keys(materials).forEach(m => gfx.loadMaterial(materials[m]));
+  gfx.loadGeometry('triangle', geometries.triangle, false);
+  gfx.loadGeometry('rectangle', geometries.rectangle, true);
+  gfx.loadGeometry('cube', geometries.cube, true);
+  gfx.loadGeometry('cylinder', geometries.cylinder, true);
+  gfx.loadGeometry('sphere', geometries.sphere, true);
+
 
   const improviz = new Improviz(gfx, eventBus);
   const editor = CodeMirror(

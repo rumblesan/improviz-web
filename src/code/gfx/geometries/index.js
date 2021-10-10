@@ -2,39 +2,11 @@ import { subtract, cross } from '../matrices';
 import { createBuffers } from '../buffers';
 
 import { readOBJ } from './readOBJ';
-import triangleOBJ from './triangle.obj';
-import rectangleOBJ from './rectangle.obj';
-import cubeOBJ from './cube.obj';
-import cylinderOBJ from './cylinder.obj';
-import sphereOBJ from './sphere.obj';
 
-export function loadAllGeometries(gl) {
-  const errors = [];
-  const geometries = {};
-
-  const triangleGeo = readOBJ('triangle', triangleOBJ, false);
-  calculateNormals(triangleGeo);
-  const rectangleGeo = readOBJ('rectangle', rectangleOBJ, true);
-  calculateNormals(rectangleGeo);
-  const cubeGeo = readOBJ('cube', cubeOBJ, true);
-  calculateNormals(cubeGeo);
-  const cylinderGeo = readOBJ('cylinder', cylinderOBJ, true);
-  calculateNormals(cylinderGeo);
-  const sphereGeo = readOBJ('sphere', sphereOBJ, true);
-  calculateNormals(sphereGeo);
-  [triangleGeo, rectangleGeo, cubeGeo, cylinderGeo, sphereGeo].forEach(geo => {
-    try {
-      const loaded = loadGeometry(gl, geo);
-      geometries[geo.name] = loaded;
-    } catch (e) {
-      errors.push(e);
-    }
-  });
-
-  return {
-    errors,
-    geometries,
-  };
+export function loadGeometryOBJ(gl, name, geometryOBJ, removeCrossBar) {
+  const geo = readOBJ(name, geometryOBJ, removeCrossBar);
+  calculateNormals(geo);
+  return loadGeometry(gl, name, geo);
 }
 
 function calculateNormals(geometry) {
@@ -57,9 +29,10 @@ function calculateFaceNormal(v1, v2, v3) {
   return cross(subtract(v1, v2), subtract(v2, v3));
 }
 
-export function loadGeometry(gl, geometry) {
+export function loadGeometry(gl, name, geometry) {
   const buffers = createBuffers(gl, geometry);
   return {
+    name,
     buffers,
     geometry,
   };
