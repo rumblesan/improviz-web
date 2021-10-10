@@ -7,36 +7,37 @@
 
   <section>
     <p>
-      All of the settings in Improviz-Web can be changed by setting query string arguments in the URL of the page.
+      This is where all the available settings for Improviz can be changed.
     </p>
   </section>
 
   <section>
-    <h4>Key Map</h4>
-    <p>The editor keymapping can be changed with the <em>keymap</em> query argument. Currently the supported bindings are the CodeMirror defaults and Vim bindings</p>
+    <label for="keymap">Keymap:
     <select name="keymap">
       {{#each keymaps}}
         <option name="{{this.name}}" {{#if this.selected}}selected{{/if}} value="{{this.name}}">{{this.name}}</option>
       {{/each}}
     </select>
-  </section>
+    </label>
 
-  <section>
-    <h4>Performance Mode</h4>
+    <br />
+
+    <label for="lineNumbers">Line Numbers:
+      <input type="checkbox" {{#if lineNumbers }}checked{{/if}} name="lineNumbers" >
+    </label>
+
+    <br />
+
+    <label for="performanceMode">Performance Mode:
+      <input type="checkbox" {{#if performanceMode }}checked{{/if}} name="performanceMode" >
+    </label>
     <p>Enabling performance mode will hide the header bar so that there can be more canvas visible</p>
-    <input type="checkbox" {{#if performanceMode }}checked{{/if}} name="performanceMode" >
-  </section>
-
-  <section>
-    <h4>Line Numbers</h4>
-    <p>Line numbers can be added to the editor with the <em>linenumbers</em> query argument.</p>
-    <input type="checkbox" {{#if lineNumbers }}checked{{/if}} name="lineNumbers" >
   </section>
 
   <section>
     <h4>Clear Settings</h4>
     <p>Settings are stored in the browser's local storage so it can be remembered between reloads, but sometimes there are issues. If things get a bit weird, then try clearing the settings here.</p>
-    <button type="button" name="clear" >Clear!</button>
+    <button type="button" name="clear">Clear!</button>
   </section>
 
 </div>
