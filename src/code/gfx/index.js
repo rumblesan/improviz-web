@@ -80,7 +80,7 @@ export class IGfx {
   getTexture() {
     const name = this.textureStack.top();
     const t = this.textures[name];
-    return exists(t) ? t.texture : this.textures.crystal.texture;
+    return exists(t) ? t.texture : null;
   }
 
   loadTexture(name, url) {
