@@ -31,7 +31,7 @@
     "eslint-plugin-prettier": "4.0.0",
     "file-loader": "6.2.0",
     "handlebars": "4.7.7",
-    "handlebars-loader": "1.7.1",
+    "handlebars-loader": "1.7.3",
     "jest": "27.2.4",
     "js-yaml-loader": "1.2.2",
     "mini-css-extract-plugin": "2.3.0",
